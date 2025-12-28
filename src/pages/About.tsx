@@ -38,7 +38,7 @@ const team = [
   {
     name: "Efetive Oguko",
     role: "Head of Partnerships",
-    image: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face",
     bio: "Connects 3PN with industry leaders and organisations committed to diversity.",
   },
   {
