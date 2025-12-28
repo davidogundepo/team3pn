@@ -4,10 +4,10 @@ import { Users, Target, Heart, Award } from "lucide-react";
 import founderPhoto from "@/assets/founder-gbenga.jpg";
 
 const stats = [
-  { value: "500+", label: "Professionals Supported" },
-  { value: "50+", label: "Partner Organisations" },
-  { value: "100+", label: "Mentors & Allies" },
-  { value: "10+", label: "Years of Impact" },
+  { value: "40+", label: "Professionals Supported" },
+  { value: "10+", label: "Partner Organisations" },
+  { value: "15+", label: "Mentors & Allies" },
+  { value: "3+", label: "Years of Impact" },
 ];
 
 const values = [
@@ -36,19 +36,19 @@ const team = [
     bio: "Built 3PN from lived experience to create the systems he wished existed when starting out.",
   },
   {
-    name: "Adaeze Nwosu",
+    name: "Efetive Oguko",
     role: "Head of Partnerships",
     image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop&crop=face",
     bio: "Connects 3PN with industry leaders and organisations committed to diversity.",
   },
   {
-    name: "Marcus Thompson",
+    name: "DK Jonah",
     role: "Mentorship Lead",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     bio: "Oversees our mentor network and ensures impactful connections.",
   },
   {
-    name: "Zara Okafor",
+    name: "Lola Adewuyi",
     role: "Community Manager",
     image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face",
     bio: "Builds and nurtures the 3PN community across all platforms.",
