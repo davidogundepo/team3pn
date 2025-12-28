@@ -1,4 +1,5 @@
 import { Rocket, TrendingUp, HeartHandshake, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const paths = [
@@ -32,7 +33,6 @@ const ChooseYourPath = () => {
   return (
     <section id="choose-path" className="py-20 md:py-28 bg-background">
       <div className="container mx-auto px-4 md:px-6">
-        {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="inline-block px-4 py-1.5 bg-accent/15 text-amber-dark rounded-full text-sm font-semibold mb-4">
             Choose Your Path
@@ -45,50 +45,36 @@ const ChooseYourPath = () => {
           </p>
         </div>
 
-        {/* Paths Grid */}
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {paths.map((path, index) => (
-            <button
+          {paths.map((path) => (
+            <Link
               key={path.title}
+              to="/assessment"
               className={`group relative bg-card rounded-2xl p-8 border border-border/60 shadow-soft hover:shadow-medium transition-all duration-300 text-left ${path.hoverBg}`}
             >
-              {/* Gradient bar */}
               <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${path.gradient} rounded-t-2xl`} />
-
-              {/* Icon */}
               <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${path.gradient} text-primary-foreground mb-6 shadow-lg group-hover:scale-105 transition-transform`}>
                 <path.icon className="w-8 h-8" />
               </div>
-
-              {/* Content */}
-              <h3 className="text-2xl font-bold text-foreground mb-1">
-                {path.title}
-              </h3>
-              <p className="text-primary font-semibold text-sm mb-4">
-                {path.subtitle}
-              </p>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                {path.description}
-              </p>
-
-              {/* CTA Arrow */}
+              <h3 className="text-2xl font-bold text-foreground mb-1">{path.title}</h3>
+              <p className="text-primary font-semibold text-sm mb-4">{path.subtitle}</p>
+              <p className="text-muted-foreground leading-relaxed mb-6">{path.description}</p>
               <div className="flex items-center text-primary font-semibold">
                 Start here
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
               </div>
-            </button>
+            </Link>
           ))}
         </div>
 
-        {/* Alternative CTA */}
         <div className="text-center mt-12">
-          <p className="text-muted-foreground mb-4">
-            Not sure which path is right for you?
-          </p>
-          <Button variant="outline" size="lg">
-            Take Our Quick Assessment First
-            <ArrowRight className="ml-2" />
-          </Button>
+          <p className="text-muted-foreground mb-4">Not sure which path is right for you?</p>
+          <Link to="/assessment">
+            <Button variant="outline" size="lg">
+              Take Our Quick Assessment First
+              <ArrowRight className="ml-2" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

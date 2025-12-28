@@ -1,55 +1,58 @@
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/3pn-logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const navLinks = [
-    { label: "What We Offer", href: "#what-we-offer" },
-    { label: "Your Path", href: "#choose-path" },
-    { label: "Our Story", href: "#our-story" },
-    { label: "Founder", href: "#founder" },
+    { label: "About", href: "/about" },
+    { label: "Resources", href: "/resources" },
+    { label: "Mentors", href: "/mentors" },
+    { label: "Events", href: "/events" },
+    { label: "Contact", href: "/contact" },
   ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <a href="#" className="flex items-center">
+          <Link to="/" className="flex items-center">
             <img 
               src={logo} 
               alt="3PN - Empowering the next generation of Black professionals" 
               className="h-10 md:h-12 w-auto"
             />
-          </a>
+          </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
-                href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200"
+                to={link.href}
+                className={`text-sm font-medium transition-colors duration-200 ${
+                  location.pathname === link.href 
+                    ? "text-primary" 
+                    : "text-muted-foreground hover:text-primary"
+                }`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
-          {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
-            <Button size="sm">
-              Start Assessment
-            </Button>
+            <Link to="/admin">
+              <Button variant="outline" size="sm">Sign In</Button>
+            </Link>
+            <Link to="/assessment">
+              <Button size="sm">Start Assessment</Button>
+            </Link>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 text-foreground"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -59,27 +62,26 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border shadow-medium animate-fade-in">
             <nav className="flex flex-col py-4 px-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.href}
+                  to={link.href}
                   className="py-3 text-base font-medium text-foreground hover:text-primary transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
               <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
-                <Button variant="outline" className="w-full">
-                  Sign In
-                </Button>
-                <Button className="w-full">
-                  Start Assessment
-                </Button>
+                <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" className="w-full">Sign In</Button>
+                </Link>
+                <Link to="/assessment" onClick={() => setIsMenuOpen(false)}>
+                  <Button className="w-full">Start Assessment</Button>
+                </Link>
               </div>
             </nav>
           </div>
