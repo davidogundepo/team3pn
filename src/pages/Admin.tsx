@@ -69,12 +69,14 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Admin Login</h1>
-          <p className="text-muted-foreground">Use admin/admin to access the dashboard</p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="flex items-center justify-center pt-32 pb-16">
+        <div className="w-full max-w-md p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-foreground mb-2">Admin Login</h1>
+            <p className="text-muted-foreground">Use admin/admin to access the dashboard</p>
+          </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
@@ -109,6 +111,7 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
             Sign In
           </Button>
         </form>
+        </div>
       </div>
     </div>
   );

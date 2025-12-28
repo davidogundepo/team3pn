@@ -50,17 +50,14 @@ const HeroSection = () => {
           <div className="flex justify-center lg:justify-end opacity-0 animate-fade-up delay-400">
             <div className="relative w-full max-w-lg">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-charcoal/20 backdrop-blur-sm border border-primary-foreground/10">
-                <div className="aspect-video bg-gradient-to-br from-charcoal/40 to-charcoal/60 flex items-center justify-center">
-                  <button 
-                    className="group relative w-20 h-20 rounded-full bg-primary-foreground flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300"
-                    aria-label="Play video: How we work"
-                  >
-                    <Play className="w-8 h-8 text-primary ml-1" fill="currentColor" />
-                    <span className="absolute inset-0 rounded-full bg-primary-foreground animate-ping opacity-30" />
-                  </button>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-sm text-primary-foreground/80 font-medium">Watch: How We Work</p>
+                <div className="aspect-video">
+                  <iframe
+                    src="https://www.youtube.com/embed/TaHN5VIiMT4"
+                    title="How We Work - 3PN"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
                 </div>
               </div>
               <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-accent/30 rounded-xl blur-xl" />
