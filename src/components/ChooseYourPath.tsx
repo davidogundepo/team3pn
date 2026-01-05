@@ -8,24 +8,21 @@ const paths = [
     title: "Launch",
     subtitle: "I'm just starting out",
     description: "I'm just starting out and need a clear roadmap to build my career with confidence.",
-    gradient: "from-primary to-teal-dark",
-    hoverBg: "hover:bg-primary/5",
+    hoverBg: "hover:border-primary",
   },
   {
     icon: TrendingUp,
     title: "Progress",
     subtitle: "I'm ready to grow",
     description: "I'm in my career and ready to scale my impact with advanced strategies and networks.",
-    gradient: "from-teal-light to-primary",
-    hoverBg: "hover:bg-teal-light/5",
+    hoverBg: "hover:border-primary",
   },
   {
     icon: HeartHandshake,
     title: "Invest",
     subtitle: "I want to give back",
     description: "I want to sponsor underserved talent or become a mentor for the next generation.",
-    gradient: "from-accent to-amber-dark",
-    hoverBg: "hover:bg-accent/5",
+    hoverBg: "hover:border-primary",
   },
 ];
 
@@ -34,7 +31,7 @@ const ChooseYourPath = () => {
     <section id="choose-path" className="py-20 md:py-28 bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="inline-block px-4 py-1.5 bg-accent/15 text-amber-dark rounded-full text-sm font-semibold mb-4">
+          <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4">
             Choose Your Path
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
@@ -50,10 +47,10 @@ const ChooseYourPath = () => {
             <Link
               key={path.title}
               to="/assessment"
-              className={`group relative bg-card rounded-2xl p-8 border border-border/60 shadow-soft hover:shadow-medium transition-all duration-300 text-left ${path.hoverBg}`}
+              className={`group relative bg-card rounded-2xl p-8 border-2 border-border shadow-soft hover:shadow-medium transition-all duration-300 text-left ${path.hoverBg}`}
             >
-              <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${path.gradient} rounded-t-2xl`} />
-              <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${path.gradient} text-primary-foreground mb-6 shadow-lg group-hover:scale-105 transition-transform`}>
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-primary rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground mb-6 shadow-lg group-hover:scale-105 transition-transform">
                 <path.icon className="w-8 h-8" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-1">{path.title}</h3>

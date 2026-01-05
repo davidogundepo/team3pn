@@ -9,11 +9,11 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { label: "About", href: "/about" },
+    { label: "About Us", href: "/about" },
     { label: "Resources", href: "/resources" },
     { label: "Mentors", href: "/mentors" },
     { label: "Events", href: "/events" },
-    { label: "Contact", href: "/contact" },
+    { label: "Contact Us", href: "/contact" },
   ];
 
   return (

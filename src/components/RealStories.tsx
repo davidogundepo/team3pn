@@ -19,41 +19,41 @@ const RealStories = () => {
             
             {/* Floating accent card */}
             <div className="absolute -bottom-6 -right-6 bg-card text-foreground rounded-xl p-4 shadow-medium max-w-[200px] hidden md:block">
-              <p className="text-2xl font-bold text-primary">500+</p>
+              <p className="text-2xl font-bold text-primary">40+</p>
               <p className="text-sm text-muted-foreground">Lives transformed through our programmes</p>
             </div>
 
             {/* Decorative elements */}
-            <div className="absolute -top-4 -left-4 w-20 h-20 bg-accent/30 rounded-full blur-xl" />
+            <div className="absolute -top-4 -left-4 w-20 h-20 bg-primary/30 rounded-full blur-xl" />
           </div>
 
           {/* Content */}
           <div className="order-1 lg:order-2">
-            <span className="inline-block px-4 py-1.5 bg-primary-foreground/15 rounded-full text-sm font-semibold mb-6">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4">
               Real Stories, Real Purpose
-            </span>
-
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6">
-              We Built the Bridge We Wished We Had
             </h2>
 
+            <p className="text-xl md:text-2xl text-primary-foreground/80 mb-8">
+              Personal journeys of growth, confidence, and finding direction
+            </p>
+
             <blockquote className="relative">
-              <div className="absolute -left-4 top-0 text-6xl text-accent/50 font-display leading-none">
+              <div className="absolute -left-4 top-0 text-6xl text-primary/50 leading-none">
                 "
               </div>
-              <p className="text-xl md:text-2xl text-primary-foreground/90 leading-relaxed pl-6 italic">
+              <p className="text-lg md:text-xl text-primary-foreground/90 leading-relaxed pl-6 italic">
                 Born from the immigrant experience, 3PN exists to ensure the next generation doesn't rely on chance, but on intentional systems for success.
               </p>
             </blockquote>
 
-            {/* Testimonial cards - could be a carousel */}
+            {/* Testimonial cards */}
             <div className="mt-10 space-y-4">
               <div className="bg-primary-foreground/10 rounded-xl p-5 backdrop-blur-sm border border-primary-foreground/10">
                 <p className="text-primary-foreground/85 mb-3">
                   "3PN gave me the clarity and connections I needed to transition from feeling stuck to leading my own team."
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-accent/30 flex items-center justify-center font-bold">
+                  <div className="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center font-bold">
                     AO
                   </div>
                   <div>

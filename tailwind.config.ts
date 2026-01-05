@@ -14,9 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["'Playfair Display'", "Georgia", "serif"],
         body: ["'DM Sans'", "system-ui", "sans-serif"],
-        handwritten: ["'Caveat'", "cursive"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -62,19 +60,20 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        cream: {
-          DEFAULT: "hsl(var(--cream))",
-          dark: "hsl(var(--cream-dark))",
-        },
-        teal: {
-          light: "hsl(var(--teal-light))",
-          dark: "hsl(var(--teal-dark))",
-        },
-        amber: {
-          light: "hsl(var(--amber-light))",
-          dark: "hsl(var(--amber-dark))",
+        orange: {
+          DEFAULT: "hsl(var(--orange))",
+          light: "hsl(var(--orange-light))",
+          dark: "hsl(var(--orange-dark))",
         },
         charcoal: "hsl(var(--charcoal))",
+        gray: {
+          50: "hsl(var(--gray-50))",
+          100: "hsl(var(--gray-100))",
+          200: "hsl(var(--gray-200))",
+          500: "hsl(var(--gray-500))",
+          700: "hsl(var(--gray-700))",
+          900: "hsl(var(--gray-900))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
