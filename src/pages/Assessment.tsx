@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowLeft, CheckCircle, Rocket, TrendingUp, HeartHandshake } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle, Rocket, TrendingUp, HeartHandshake, Clock, Zap, Target } from "lucide-react";
 
 const questions = [
   {
@@ -12,8 +12,8 @@ const questions = [
     options: [
       { value: "starting", label: "Just starting out or exploring options", points: { launch: 3, progress: 0, invest: 0 } },
       { value: "early", label: "Early career (0-3 years experience)", points: { launch: 2, progress: 1, invest: 0 } },
-      { value: "mid", label: "Mid-career (3-10 years experience)", points: { launch: 0, progress: 3, invest: 1 } },
-      { value: "senior", label: "Senior or leadership level", points: { launch: 0, progress: 1, invest: 3 } },
+      { value: "established", label: "Established professional (3+ years)", points: { launch: 0, progress: 3, invest: 1 } },
+      { value: "senior", label: "Senior or want to give back", points: { launch: 0, progress: 1, invest: 3 } },
     ],
   },
   {
@@ -21,39 +21,17 @@ const questions = [
     question: "What's your main goal right now?",
     options: [
       { value: "clarity", label: "Finding clarity and direction", points: { launch: 3, progress: 1, invest: 0 } },
-      { value: "skills", label: "Building new skills", points: { launch: 2, progress: 2, invest: 0 } },
-      { value: "network", label: "Expanding my professional network", points: { launch: 1, progress: 3, invest: 1 } },
-      { value: "give-back", label: "Giving back and mentoring others", points: { launch: 0, progress: 0, invest: 3 } },
+      { value: "growth", label: "Growing my skills and network", points: { launch: 1, progress: 3, invest: 0 } },
+      { value: "give-back", label: "Mentoring and giving back", points: { launch: 0, progress: 0, invest: 3 } },
     ],
   },
   {
     id: 3,
-    question: "How much time can you dedicate to your development?",
-    options: [
-      { value: "minimal", label: "A few hours per month", points: { launch: 1, progress: 1, invest: 2 } },
-      { value: "moderate", label: "A few hours per week", points: { launch: 2, progress: 2, invest: 1 } },
-      { value: "significant", label: "Several hours per week", points: { launch: 2, progress: 3, invest: 1 } },
-      { value: "intensive", label: "I'm ready to fully commit", points: { launch: 3, progress: 2, invest: 1 } },
-    ],
-  },
-  {
-    id: 4,
     question: "What would be most valuable to you?",
     options: [
       { value: "roadmap", label: "A clear step-by-step roadmap", points: { launch: 3, progress: 1, invest: 0 } },
-      { value: "mentor", label: "Access to a senior mentor", points: { launch: 1, progress: 3, invest: 0 } },
-      { value: "opportunities", label: "Exclusive job opportunities", points: { launch: 2, progress: 3, invest: 0 } },
+      { value: "connections", label: "Access to mentors and opportunities", points: { launch: 1, progress: 3, invest: 0 } },
       { value: "impact", label: "Opportunity to shape others' careers", points: { launch: 0, progress: 0, invest: 3 } },
-    ],
-  },
-  {
-    id: 5,
-    question: "What's your biggest challenge?",
-    options: [
-      { value: "direction", label: "Not knowing where to start", points: { launch: 3, progress: 0, invest: 0 } },
-      { value: "visibility", label: "Getting noticed for opportunities", points: { launch: 1, progress: 3, invest: 0 } },
-      { value: "network", label: "Lack of professional connections", points: { launch: 2, progress: 2, invest: 0 } },
-      { value: "time", label: "Finding time to help others", points: { launch: 0, progress: 0, invest: 3 } },
     ],
   },
 ];
@@ -70,7 +48,6 @@ const pathDetails = {
       "Join our community of early-career professionals",
       "Get matched with a Launch mentor",
     ],
-    gradient: "from-primary to-teal-dark",
   },
   progress: {
     icon: TrendingUp,
@@ -83,7 +60,6 @@ const pathDetails = {
       "Join exclusive networking events",
       "Receive curated opportunity alerts",
     ],
-    gradient: "from-teal-light to-primary",
   },
   invest: {
     icon: HeartHandshake,
@@ -96,9 +72,14 @@ const pathDetails = {
       "Join our mentor community",
       "Access mentor training resources",
     ],
-    gradient: "from-accent to-amber-dark",
   },
 };
+
+const whatYouGet = [
+  { icon: Zap, title: "Clarity", description: "Know exactly which path fits your current situation" },
+  { icon: Target, title: "Next Action", description: "Get a clear first step to take right now" },
+  { icon: CheckCircle, title: "Simple Plan", description: "A straightforward roadmap tailored to you" },
+];
 
 const Assessment = () => {
   const navigate = useNavigate();
@@ -106,6 +87,8 @@ const Assessment = () => {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [scores, setScores] = useState({ launch: 0, progress: 0, invest: 0 });
   const [showResults, setShowResults] = useState(false);
+  const [captureInfo, setCaptureInfo] = useState(false);
+  const [userInfo, setUserInfo] = useState({ name: "", email: "" });
 
   const handleAnswer = (value: string, points: { launch: number; progress: number; invest: number }) => {
     setAnswers((prev) => ({ ...prev, [currentQuestion]: value }));
@@ -146,9 +129,14 @@ const Assessment = () => {
     return "launch";
   };
 
+  const handleSaveResults = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Saving results for:", userInfo);
+    setCaptureInfo(false);
+  };
+
   const recommendedPath = getRecommendedPath();
   const pathInfo = pathDetails[recommendedPath];
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   if (showResults) {
     return (
@@ -169,8 +157,8 @@ const Assessment = () => {
                 </div>
 
                 {/* Recommended Path Card */}
-                <div className={`bg-gradient-to-br ${pathInfo.gradient} rounded-2xl p-8 text-primary-foreground mb-8`}>
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-foreground/20 mb-6">
+                <div className="bg-gradient-hero rounded-2xl p-8 text-primary-foreground mb-8">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-6">
                     <pathInfo.icon className="w-8 h-8" />
                   </div>
                   <h2 className="text-3xl font-bold mb-2">{pathInfo.title}</h2>
@@ -182,7 +170,7 @@ const Assessment = () => {
                     <ul className="space-y-3">
                       {pathInfo.nextSteps.map((step, index) => (
                         <li key={index} className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0 text-primary" />
                           <span>{step}</span>
                         </li>
                       ))}
@@ -190,9 +178,42 @@ const Assessment = () => {
                   </div>
                 </div>
 
+                {/* Capture Email */}
+                {!captureInfo ? (
+                  <div className="bg-muted rounded-xl p-6 mb-8">
+                    <p className="text-foreground font-semibold mb-2">Want to save your results?</p>
+                    <p className="text-muted-foreground text-sm mb-4">Get your personalized roadmap and updates sent to your inbox.</p>
+                    <Button onClick={() => setCaptureInfo(true)}>
+                      Save My Results
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSaveResults} className="bg-muted rounded-xl p-6 mb-8 space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Your name"
+                      value={userInfo.name}
+                      onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
+                      required
+                      className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Your email"
+                      value={userInfo.email}
+                      onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+                      required
+                      className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <Button type="submit" className="w-full">
+                      Send My Roadmap
+                    </Button>
+                  </form>
+                )}
+
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button size="lg" onClick={() => navigate("/")}>
-                    Get Started
+                  <Button size="lg" onClick={() => navigate("/about")}>
+                    Learn More About 3PN
                     <ArrowRight className="ml-2" />
                   </Button>
                   <Button 
@@ -203,6 +224,8 @@ const Assessment = () => {
                       setCurrentQuestion(0);
                       setAnswers({});
                       setScores({ launch: 0, progress: 0, invest: 0 });
+                      setCaptureInfo(false);
+                      setUserInfo({ name: "", email: "" });
                     }}
                   >
                     Retake Assessment
@@ -226,16 +249,28 @@ const Assessment = () => {
         <section className="py-16 md:py-24">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-2xl mx-auto">
+              {/* Intro Text - only on first question */}
+              {currentQuestion === 0 && (
+                <div className="text-center mb-10">
+                  <div className="inline-flex items-center gap-2 text-muted-foreground text-sm mb-4">
+                    <Clock className="w-4 h-4" />
+                    <span>10–20 seconds</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    No login. 3 quick questions. Instant result.
+                  </p>
+                </div>
+              )}
+
               {/* Progress Bar */}
               <div className="mb-8">
                 <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                  <span>Question {currentQuestion + 1} of {questions.length}</span>
-                  <span>{Math.round(progress)}% complete</span>
+                  <span className="font-semibold">Question {currentQuestion + 1} of {questions.length}</span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-primary transition-all duration-300"
-                    style={{ width: `${progress}%` }}
+                    style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
                   />
                 </div>
               </div>
@@ -256,10 +291,10 @@ const Assessment = () => {
                   <button
                     key={option.value}
                     onClick={() => handleAnswer(option.value, option.points)}
-                    className={`w-full p-5 rounded-xl border-2 text-left transition-all ${
+                    className={`w-full p-5 rounded-xl border-2 text-left transition-all hover:border-primary hover:bg-primary/5 ${
                       answers[currentQuestion] === option.value
                         ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                        : "border-border"
                     }`}
                   >
                     <span className="text-lg font-medium text-foreground">{option.label}</span>
@@ -274,6 +309,24 @@ const Assessment = () => {
                     <ArrowLeft className="mr-2 w-4 h-4" />
                     Previous Question
                   </Button>
+                </div>
+              )}
+
+              {/* What You Get - only on first question */}
+              {currentQuestion === 0 && (
+                <div className="mt-16 pt-8 border-t border-border">
+                  <h3 className="text-lg font-bold text-foreground text-center mb-6">What You Get</h3>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    {whatYouGet.map((item) => (
+                      <div key={item.title} className="text-center p-4">
+                        <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-3">
+                          <item.icon className="w-5 h-5" />
+                        </div>
+                        <h4 className="font-semibold text-foreground mb-1">{item.title}</h4>
+                        <p className="text-sm text-muted-foreground">{item.description}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
