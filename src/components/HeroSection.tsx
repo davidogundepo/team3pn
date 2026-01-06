@@ -14,21 +14,23 @@ const HeroSection = () => {
         <div className="flex flex-col items-center min-h-[calc(100vh-5rem)] py-12">
           {/* Top Content */}
           <div className="flex flex-col items-center text-center text-primary-foreground max-w-4xl pt-8 md:pt-12">
-            <div className="inline-flex items-center gap-3 mb-6 opacity-0 animate-fade-up">
-              <div className="flex gap-2">
-                <span className="px-3 py-1 bg-primary-foreground/15 rounded-full text-sm font-medium backdrop-blur-sm">People</span>
-                <span className="px-3 py-1 bg-primary-foreground/15 rounded-full text-sm font-medium backdrop-blur-sm">Passion</span>
-                <span className="px-3 py-1 bg-primary-foreground/15 rounded-full text-sm font-medium backdrop-blur-sm">Purpose</span>
-              </div>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 opacity-0 animate-fade-up delay-100">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 opacity-0 animate-fade-up">
               Find Your Direction. Build Your Future.
             </h1>
 
-            <p className="text-lg md:text-xl text-primary-foreground/85 leading-relaxed mb-8 max-w-3xl opacity-0 animate-fade-up delay-200">
+            <p className="text-lg md:text-xl text-primary-foreground/85 leading-relaxed mb-8 max-w-3xl opacity-0 animate-fade-up delay-100">
               Whether you're starting out, changing paths, or feeling stuck, 3PN offers a free, clear three-step journey to build skills, prove your experience, and grow into leadership. Get your next step in under a minute.
             </p>
+
+            {/* Primary CTA Above Video */}
+            <div className="opacity-0 animate-fade-up delay-200 mb-8">
+              <Link to="/assessment">
+                <Button size="lg" className="group bg-primary hover:bg-primary/90 text-primary-foreground">
+                  Take Self-Assessment
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Video Section */}
@@ -46,18 +48,10 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* CTAs Below Video */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-8 opacity-0 animate-fade-up delay-400">
-            <Link to="/about">
-              <Button size="lg" className="group w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">
-                Find Out More
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-            <Link to="/assessment">
-              <Button variant="heroOutline" size="lg" className="w-full sm:w-auto">
-                Take Self-Assessment
-              </Button>
+          {/* Find Out More Below Video */}
+          <div className="flex justify-center mt-8 opacity-0 animate-fade-up delay-400">
+            <Link to="/about" className="text-primary-foreground/80 hover:text-primary-foreground underline underline-offset-4 font-medium transition-colors">
+              Find out more
             </Link>
           </div>
         </div>
