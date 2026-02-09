@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/3pn-logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const navLinks = [
     { label: "About Us", href: "/about" },
@@ -15,6 +18,11 @@ const Header = () => {
     { label: "Events", href: "/events" },
     { label: "Contact Us", href: "/contact" },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
@@ -45,12 +53,29 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/admin">
-              <Button variant="outline" size="sm">Sign In</Button>
-            </Link>
-            <Link to="/assessment">
-              <Button size="sm">Start Assessment</Button>
-            </Link>
+            {user ? (
+              <>
+                <Link to="/dashboard">
+                  <Button variant="outline" size="sm">
+                    <User className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" size="sm">Sign In</Button>
+                </Link>
+                <Link to="/assessment">
+                  <Button size="sm">Start Assessment</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           <button
