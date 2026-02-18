@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Users, Sparkles, ArrowRight, Heart, Target, BookOpen } from "lucide-react";
+import { Users, ArrowRight, Heart, Target, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Mentors = () => {
@@ -11,12 +11,9 @@ const Mentors = () => {
       <main className="container mx-auto px-4 md:px-6 py-16 md:py-24">
         {/* Coming Soon Hero */}
         <div className="max-w-2xl mx-auto text-center">
-          {/* Animated Logo */}
-          <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/10 to-orange-500/10 mb-8">
-            <Users className="w-12 h-12 text-primary" />
-            <div className="absolute -top-1 -right-1">
-              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-            </div>
+          {/* Logo */}
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-secondary/30 mb-8 text-foreground">
+            <Users className="w-10 h-10" />
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
