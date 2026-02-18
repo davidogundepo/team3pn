@@ -670,7 +670,7 @@ const Assessment = () => {
                     <Sparkles className="w-3.5 h-3.5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-primary">AI Coach</p>
+                    <p className="text-xs font-bold text-primary">Your Coach</p>
                     <p className="text-[10px] text-muted-foreground">{question.pillar} · {question.quality}</p>
                   </div>
                 </div>

@@ -574,7 +574,7 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-primary flex items-center gap-1.5">
-                    AI Insight
+                    Daily Insight
                     <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10">Fresh</span>
                   </h3>
                   <p className="text-xs text-muted-foreground">Personalised for you</p>
@@ -629,7 +629,7 @@ const Dashboard = () => {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">Generating your AI insight...</p>
+                <p className="text-sm font-medium text-foreground">Generating your insight...</p>
                 <p className="text-xs text-muted-foreground">Personalised just for you</p>
               </div>
             </div>
