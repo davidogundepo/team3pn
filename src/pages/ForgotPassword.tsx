@@ -74,7 +74,7 @@ const ForgotPassword = () => {
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-foreground mb-2">Forgot Password?</h2>
                 <p className="text-sm text-muted-foreground">
-                  No worries — enter your email and we'll send you a link to reset it.
+                  No worries, enter your email and we'll send you a link to reset it.
                 </p>
               </div>
 

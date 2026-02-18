@@ -382,7 +382,7 @@ export const assessmentQuestions: Question[] = [
       },
       {
         quadrant: 4,
-        label: "I consistently use strong soft skills — like communication, teamwork, and emotional awareness — to perform well, influence others, and lead",
+        label: "I consistently use strong soft skills, like communication, teamwork, and emotional awareness, to perform well, influence others, and lead",
         internalState: 'command',
         externalState: 'system',
       },

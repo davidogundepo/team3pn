@@ -8,7 +8,7 @@ const Events = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 md:px-6 pt-28 pb-16 md:pt-32 md:pb-24">
+      <main className="container mx-auto px-4 md:px-6 py-16 md:py-24">
         {/* Coming Soon Hero */}
         <div className="max-w-2xl mx-auto text-center">
           {/* Animated Logo */}

@@ -12,11 +12,11 @@ const faqs = [
   },
   {
     q: "What is the CAD Assessment?",
-    a: "The CAD (Clarity, Action, Development) Assessment is our proprietary diagnostic tool. It evaluates your current career stage across three pillars and places you in one of four quadrants — each with a tailored pathway and AI-powered insights to guide your next steps."
+    a: "The CAD (Clarity, Action, Development) Assessment is our proprietary diagnostic tool. It evaluates your current career stage across three pillars and places you in one of four quadrants, each with a tailored pathway and AI-powered insights to guide your next steps."
   },
   {
     q: "Is 3PN really free?",
-    a: "Yes — completely free. Our mission is to remove barriers, not add them. The assessment, resources, and community access are all free. Premium features like 1-on-1 mentorship matching may have optional tiers in the future."
+    a: "Yes, completely free. Our mission is to remove barriers, not add them. The assessment, resources, and community access are all free. Premium features like 1-on-1 mentorship matching may have optional tiers in the future."
   },
   {
     q: "How does the mentorship programme work?",
@@ -24,7 +24,7 @@ const faqs = [
   },
   {
     q: "Can I retake the assessment?",
-    a: "Absolutely. We encourage retaking the assessment as you grow. Your quadrant may change as you develop new skills and systems — that's the whole point. Each assessment gives you updated insights and tracks your progress over time."
+    a: "Absolutely. We encourage retaking the assessment as you grow. Your quadrant may change as you develop new skills and systems, and that's the whole point. Each assessment gives you updated insights and tracks your progress over time."
   },
 ];
 

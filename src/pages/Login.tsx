@@ -18,7 +18,7 @@ const friendlyAuthError = (error: any, isLogin: boolean): string => {
   // --- Signup errors ---
   if (!isLogin) {
     if (msg.includes('user already registered') || msg.includes('already been registered')) {
-      return 'This email already has an account. Try signing in instead — or use Google if you signed up that way.';
+      return 'This email already has an account. Try signing in instead, or use Google if you signed up that way.';
     }
     if (msg.includes('password') && msg.includes('characters')) {
       return 'Password must be at least 6 characters.';
@@ -40,7 +40,7 @@ const friendlyAuthError = (error: any, isLogin: boolean): string => {
     return 'Too many attempts. Please wait a moment and try again.';
   }
   if (msg.includes('network') || msg.includes('fetch')) {
-    return 'Network error — please check your connection and try again.';
+    return 'Network error, please check your connection and try again.';
   }
   if (msg.includes('provider') && msg.includes('linked')) {
     return 'This email is linked to Google sign-in. Use the Google button below.';
@@ -134,7 +134,7 @@ const Login = () => {
             <p className="text-sm text-muted-foreground">
               {isLogin
                 ? 'Access your CAD Diagnostic dashboard and track progress'
-                : 'Join the 3PN network — Prepare, Progress, and Prosper'}
+                : 'Join the 3PN network. Prepare, Progress, and Prosper'}
             </p>
           </div>
 

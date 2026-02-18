@@ -7,7 +7,7 @@ const offerings = [
     title: "Core Scan",
     tagline: "A quick starting point",
     description:
-      "A simple self-assessment that helps you understand where you are and what to focus on next. No commitment—just clarity.",
+      "A simple self-assessment that helps you understand where you are and what to focus on next. No commitment, just clarity.",
     cta: "Take the Scan",
   },
   {
@@ -23,7 +23,7 @@ const offerings = [
     title: "The Access Engine",
     tagline: "Purposeful relationships and opportunities",
     description:
-      "Curated access to senior mentors, professional allies, and insider opportunities—when you're ready to take focused steps toward leadership.",
+      "Curated access to senior mentors, professional allies, and insider opportunities, available when you're ready to take focused steps toward leadership.",
     cta: "Unlock Access",
   },
 ];

@@ -125,7 +125,7 @@ const About = () => {
                 Setting You Up for a Successful Career Journey
               </h1>
               <p className="text-xl text-primary-foreground/85 leading-relaxed">
-                Born from the reality that many young adults are left without clear direction or support, 3PN exists to ensure the next generation doesn't rely on chance—but on intentional systems and structures designed to help them succeed.
+                Born from the reality that many young adults are left without clear direction or support, 3PN exists to ensure the next generation doesn't rely on chance, but on intentional systems and structures designed to help them succeed.
               </p>
             </div>
           </div>

@@ -60,7 +60,7 @@ const Privacy = () => {
               <h2 className="text-xl font-semibold text-foreground mb-3">5. Data Sharing</h2>
               <p>We do not sell, trade, or rent your personal information to third parties. We may share data only in these limited circumstances:</p>
               <ul className="list-disc pl-6 space-y-1 mt-2">
-                <li><strong>AI Processing:</strong> Assessment responses are processed using Google's Gemini AI to generate personalized insights. No personally identifiable information is sent to the AI — only your assessment scores and quadrant results.</li>
+                <li><strong>AI Processing:</strong> Assessment responses are processed using Google's Gemini AI to generate personalized insights. No personally identifiable information is sent to the AI, only your assessment scores and quadrant results.</li>
                 <li><strong>Admin Access:</strong> Platform administrators may view aggregate data (e.g., total users, quadrant distributions) but do not access individual assessment responses.</li>
                 <li><strong>Legal Requirements:</strong> We may disclose information if required by law.</li>
               </ul>

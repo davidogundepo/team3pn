@@ -354,7 +354,7 @@ const Dashboard = () => {
                   <div className="flex items-center gap-4 mt-3 justify-center md:justify-start text-sm text-muted-foreground">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5" />
-                      Joined {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—'}
+                      Joined {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '...'}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <Trophy className="w-3.5 h-3.5" />
@@ -643,7 +643,7 @@ const Dashboard = () => {
                       Your Mastery Voyage
                     </CardTitle>
                     <CardDescription>
-                      Building your way from Potential to Power — one block at a time
+                      Building your way from Potential to Power, one block at a time
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

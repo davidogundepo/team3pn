@@ -787,7 +787,7 @@ const AdminDashboard = ({ onLogout }: { onLogout: () => void }) => {
                     <option value="">Select recipient...</option>
                     <option value="all">All Users ({allUsers.length})</option>
                     {allUsers.map(u => (
-                      <option key={u.id} value={u.id}>{u.full_name || 'Anonymous'} — {u.email}</option>
+                      <option key={u.id} value={u.id}>{u.full_name || 'Anonymous'} ({u.email})</option>
                     ))}
                   </select>
                   <input

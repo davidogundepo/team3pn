@@ -283,7 +283,7 @@ const Assessment = () => {
     // Add header
     doc.setFontSize(24);
     doc.setTextColor(79, 70, 229);
-    doc.text('3PN Mastery Voyage — CAD Diagnostic', 20, 30);
+    doc.text('3PN Mastery Voyage: CAD Diagnostic', 20, 30);
     
     // Add subtitle
     doc.setFontSize(11);
@@ -399,7 +399,7 @@ const Assessment = () => {
   const shareViaEmail = () => {
     if (!quadrant || !cadResults) return;
     const quadInfo = quadrantDetails[quadrant];
-    const subject = encodeURIComponent('My 3PN Mastery Voyage — CAD Diagnostic Results');
+    const subject = encodeURIComponent('My 3PN Mastery Voyage: CAD Diagnostic Results');
     const body = encodeURIComponent(
       `My 3PN CAD Diagnostic Results\n\n` +
       `Quadrant: ${quadInfo.title}\n` +
@@ -409,7 +409,7 @@ const Assessment = () => {
       `${quadInfo.description}\n\n` +
       (aiInsights?.summary ? `AI Insights: ${aiInsights.summary}\n\n` : '') +
       `Take the assessment: ${window.location.origin}/assessment\n\n` +
-      `— 3PN: Prepare, Progress, and Prosper Network`
+      `- 3PN: Prepare, Progress, and Prosper Network`
     );
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
   };
@@ -438,7 +438,7 @@ const Assessment = () => {
                         Your Mastery Voyage Begins! 🎉
                       </h1>
                       <p className="text-lg text-muted-foreground">
-                        Your CAD Diagnostic is complete — your journey from Point A (Potential) to Point B (Power) starts now
+                        Your CAD Diagnostic is complete. Your journey from Point A (Potential) to Point B (Power) starts now
                       </p>
                     </div>
 
@@ -696,7 +696,7 @@ const Assessment = () => {
                     Question {currentQuestion + 1} of {assessmentQuestions.length}
                   </span>
                   <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">
-                    {question.pillar} — {question.quality}
+                    {question.pillar} · {question.quality}
                   </span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">

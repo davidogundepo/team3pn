@@ -35,7 +35,7 @@ const FounderSection = () => {
 
             <div className="space-y-5 text-lg text-muted-foreground leading-relaxed">
               <p>
-                When I was starting out, I did everything I was told to do—studied hard, 
+                When I was starting out, I did everything I was told to do, studied hard, 
                 earned qualifications, worked relentlessly. But what I didn't have was 
                 clarity, access, or a clear path forward. Too much depended on luck.
               </p>
@@ -64,7 +64,7 @@ const FounderSection = () => {
 
             {/* Signature */}
             <div className="mt-10 pt-6 border-t border-border">
-              <p className="font-handwritten text-2xl text-foreground">— Gbenga</p>
+              <p className="font-handwritten text-2xl text-foreground">~ Gbenga</p>
               <p className="text-sm text-muted-foreground mt-1">Founder, 3PN</p>
             </div>
           </div>

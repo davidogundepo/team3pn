@@ -19,7 +19,7 @@ const HeroSection = () => {
             </h1>
 
             <p className="text-lg md:text-xl text-primary-foreground/85 leading-relaxed mb-8 max-w-3xl opacity-0 animate-fade-up delay-100">
-              Stop outsourcing your potential. 3PN's CAD Diagnostic helps you discover your quadrant, unlock your strategic pathway, and journey from Point A (Potential) to Point B (Power) — all completely free.
+              Stop outsourcing your potential. 3PN's CAD Diagnostic helps you discover your quadrant, unlock your strategic pathway, and journey from Point A (Potential) to Point B (Power), all completely free.
             </p>
 
             {/* Primary CTA Above Video */}

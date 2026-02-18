@@ -21,7 +21,7 @@ const Terms = () => {
             <section>
               <h2 className="text-xl font-semibold text-foreground mb-3">2. About 3PN</h2>
               <p>
-                3PN — Prepare, Progress, and Prosper Network — is a career readiness platform designed to help young professionals navigate their journey from potential to power. Our CAD (Capability, Competence, Character, and Capacity) Diagnostic framework provides personalized insights to guide your professional development.
+                3PN (Prepare, Progress, and Prosper Network) is a career readiness platform designed to help young professionals navigate their journey from potential to power. Our CAD (Capability, Competence, Character, and Capacity) Diagnostic framework provides personalized insights to guide your professional development.
               </p>
             </section>
 

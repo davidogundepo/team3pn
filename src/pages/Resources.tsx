@@ -22,7 +22,7 @@ const resources = [
     id: 2,
     type: "video",
     category: "Videos",
-    title: "The Un-Outsourcing Philosophy — Taking Back Control",
+    title: "The Un-Outsourcing Philosophy: Taking Back Control",
     description: "A deep dive into transitioning from passenger to pilot in your career. Discover what it means to stop outsourcing your growth and own your trajectory.",
     duration: "38 min",
     image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=400&h=250&fit=crop",
@@ -32,7 +32,7 @@ const resources = [
     id: 3,
     type: "guide",
     category: "Guides",
-    title: "From New Traveler to Systemic Leverage Peak — Your Quadrant Roadmap",
+    title: "From New Traveler to Systemic Leverage Peak: Your Quadrant Roadmap",
     description: "A step-by-step guide to navigating Q1 through Q4, with actionable milestones for each stage of your mastery voyage.",
     readTime: "20 min read",
     image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=250&fit=crop",
@@ -42,7 +42,7 @@ const resources = [
     id: 4,
     type: "article",
     category: "Articles",
-    title: "Building Capability — The Foundation of Career Mastery",
+    title: "Building Capability: The Foundation of Career Mastery",
     description: "Capability is the first pillar of the 3Cs. Learn how to identify your core skills, address gaps, and build a solid professional foundation.",
     readTime: "7 min read",
     image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=250&fit=crop",
@@ -62,7 +62,7 @@ const resources = [
     id: 6,
     type: "template",
     category: "Templates",
-    title: "Personal Development Plan — 3PN Edition",
+    title: "Personal Development Plan (3PN Edition)",
     description: "Download our structured PDP template built around the four CAD pillars. Set quarterly goals aligned to your quadrant and strategic pathway.",
     downloadable: true,
     image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=250&fit=crop",
@@ -82,7 +82,7 @@ const resources = [
     id: 8,
     type: "video",
     category: "Videos",
-    title: "Competence vs Capability — What's the Difference?",
+    title: "Competence vs Capability: What's the Difference?",
     description: "Understanding the distinction between what you know (Capability) and how well you execute (Competence) is key to unlocking your next quadrant.",
     duration: "22 min",
     image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=250&fit=crop",
@@ -92,7 +92,7 @@ const resources = [
     id: 9,
     type: "guide",
     category: "Guides",
-    title: "Building Your Capacity — Systems That Scale Your Impact",
+    title: "Building Your Capacity: Systems That Scale Your Impact",
     description: "Capacity is what separates Q3 from Q4. Learn how to build reliable systems, delegate effectively, and create leverage in your career or business.",
     readTime: "15 min read",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop",
@@ -156,7 +156,7 @@ const Resources = () => {
                 <div
                   key={resource.id}
                   className="group bg-card rounded-2xl overflow-hidden border border-border/60 shadow-soft hover:shadow-medium transition-shadow cursor-pointer"
-                  onClick={() => toast.info(`"${resource.title}" — full content coming soon!`)}
+                  onClick={() => toast.info(`"${resource.title}", full content coming soon!`)}
                 >
                   <div className="relative">
                     <img
@@ -220,7 +220,7 @@ const Resources = () => {
                 <div
                   key={resource.id}
                   className="group bg-card rounded-xl overflow-hidden border border-border/60 shadow-soft hover:shadow-medium transition-shadow cursor-pointer"
-                  onClick={() => toast.info(`"${resource.title}" — full content coming soon!`)}
+                  onClick={() => toast.info(`"${resource.title}", full content coming soon!`)}
                 >
                   <div className="relative h-40">
                     <img
