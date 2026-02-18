@@ -561,46 +561,23 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* AI Insight Card */}
+          {/* Daily Insight */}
           {aiInsight && !aiInsightLoading && (
-            <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-purple-500/5 p-6 mb-8 shadow-lg">
-              {/* Decorative sparkles */}
-              <div className="absolute top-3 right-4 text-primary/20 text-2xl animate-pulse">✦</div>
-              <div className="absolute bottom-4 left-6 text-purple-400/20 text-lg" style={{ animationDelay: '1s' }}>✦</div>
-              
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center flex-shrink-0 shadow-md">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-primary flex items-center gap-1.5">
-                    Daily Insight
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10">Fresh</span>
-                  </h3>
-                  <p className="text-xs text-muted-foreground">Personalised for you</p>
-                </div>
-              </div>
+            <div className="rounded-2xl border border-border bg-card p-6 mb-8">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-4">Daily Insight</p>
 
               <div className="grid md:grid-cols-2 gap-5">
-                {/* Left: AI Recommendation */}
                 <div className="space-y-4">
-                  <div>
-                    <p className="text-sm leading-relaxed text-foreground/90">{aiInsight.recommendation}</p>
-                  </div>
-                  <div className="flex items-start gap-2 bg-primary/5 rounded-xl p-3">
-                    <span className="text-primary font-bold text-sm mt-0.5">→</span>
-                    <div>
-                      <p className="text-xs font-semibold text-primary mb-0.5">Today's Action</p>
-                      <p className="text-sm text-foreground/80">{aiInsight.actionStep}</p>
-                    </div>
+                  <p className="text-sm leading-relaxed text-foreground/90">{aiInsight.recommendation}</p>
+                  <div className="border-l-2 border-primary pl-3">
+                    <p className="text-xs font-semibold text-foreground mb-0.5">Today's Action</p>
+                    <p className="text-sm text-foreground/80">{aiInsight.actionStep}</p>
                   </div>
                 </div>
 
-                {/* Right: Reflection + Famous Figure */}
                 <div className="space-y-4">
-                  <div className="bg-muted/50 rounded-xl p-4 border border-border/50">
-                    <p className="text-xs font-semibold text-muted-foreground mb-1.5">Reflection</p>
-                    <p className="text-sm italic leading-relaxed text-foreground/80">"{aiInsight.reflection}"</p>
+                  <div className="bg-muted/40 rounded-lg p-4">
+                    <p className="text-sm italic leading-relaxed text-foreground/70">"{aiInsight.reflection}"</p>
                   </div>
                   {(() => {
                     const q = latestAssessment?.cad_results?.dominantQuadrant || 0;
@@ -608,12 +585,9 @@ const Dashboard = () => {
                     if (figures.length === 0) return null;
                     const fig = figures[getDailyInsightIndex(figures)].figure;
                     return (
-                      <div className="flex items-start gap-3 px-1">
-                        <span className="text-2xl">{fig.emoji}</span>
-                        <div>
-                          <p className="text-xs font-bold text-foreground">{fig.name}</p>
-                          <p className="text-xs text-muted-foreground leading-relaxed">{fig.story}</p>
-                        </div>
+                      <div className="px-1">
+                        <p className="text-xs font-bold text-foreground">{fig.name}</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{fig.story}</p>
                       </div>
                     );
                   })()}
@@ -622,16 +596,10 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* AI Insight Loading State */}
+          {/* Insight Loading */}
           {aiInsightLoading && (
-            <div className="rounded-2xl border border-primary/10 bg-card p-6 mb-8 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center flex-shrink-0 animate-pulse">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">Generating your insight...</p>
-                <p className="text-xs text-muted-foreground">Personalised just for you</p>
-              </div>
+            <div className="rounded-2xl border border-border bg-card p-6 mb-8">
+              <p className="text-sm text-muted-foreground animate-pulse">Generating your insight...</p>
             </div>
           )}
 
