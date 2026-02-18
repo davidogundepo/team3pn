@@ -38,9 +38,9 @@ const HeroSection = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-charcoal/20 backdrop-blur-sm border border-primary-foreground/10">
               <div className="aspect-video">
                 <iframe
-                  src="https://www.youtube.com/embed/TaHN5VIiMT4"
-                  title="How We Work - 3PN"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  src="https://drive.google.com/file/d/1_SaGwSIltH7S9QdHGKoQUgbhmLC5NTyn/preview"
+                  title="3PN - Your Mastery Voyage"
+                  allow="autoplay; encrypted-media"
                   allowFullScreen
                   className="w-full h-full"
                 />

@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { Mail, Linkedin, Twitter, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import logo from "@/assets/3pn-logo.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [subEmail, setSubEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
 
   const footerLinks = {
     resources: [
@@ -15,7 +19,7 @@ const Footer = () => {
     company: [
       { label: "About Us", href: "/about" },
       { label: "Contact Us", href: "/contact" },
-      { label: "Join Our Network", href: "/admin" },
+      { label: "FAQs", href: "/contact" },
     ],
   };
 
@@ -25,6 +29,19 @@ const Footer = () => {
     { icon: Instagram, href: "#", label: "Instagram" },
     { icon: Mail, href: "mailto:hello@3pngroup.com", label: "Email" },
   ];
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!subEmail.trim()) return;
+    setSubscribing(true);
+    // Simulate — replace with real API later
+    await new Promise((r) => setTimeout(r, 800));
+    toast.success("You're subscribed! 🎉", {
+      description: "We'll keep you updated with the latest from 3PN.",
+    });
+    setSubEmail("");
+    setSubscribing(false);
+  };
 
   return (
     <footer className="bg-charcoal text-primary-foreground">
@@ -78,14 +95,21 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Stay Updated</h4>
             <p className="text-primary-foreground/70 text-sm mb-4">Get the latest opportunities and insights.</p>
-            <form className="flex flex-col gap-3">
+            <form className="flex flex-col gap-3" onSubmit={handleSubscribe}>
               <input
                 type="email"
                 placeholder="Enter your email"
+                value={subEmail}
+                onChange={(e) => setSubEmail(e.target.value)}
+                required
                 className="px-4 py-2.5 rounded-lg bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               />
-              <button type="submit" className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors">
-                Subscribe
+              <button
+                type="submit"
+                disabled={subscribing}
+                className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {subscribing ? "Subscribing..." : "Subscribe"}
               </button>
             </form>
           </div>
@@ -93,10 +117,14 @@ const Footer = () => {
       </div>
 
       <div className="border-t border-primary-foreground/10">
-        <div className="container mx-auto px-4 md:px-6 py-6">
-          <p className="text-primary-foreground/60 text-sm text-center">
+        <div className="container mx-auto px-4 md:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-primary-foreground/60 text-sm">
             © {currentYear} 3PN. All rights reserved.
           </p>
+          <div className="flex gap-4 text-primary-foreground/60 text-sm">
+            <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
+            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
+          </div>
         </div>
       </div>
     </footer>

@@ -43,14 +43,23 @@ const FounderSection = () => {
               <p className="font-semibold text-foreground">
                 3PN was born from that gap.
               </p>
+
+              <p>
+                A platform that gives every ambitious Black professional what I wish I'd had: 
+                diagnostic clarity, a structured pathway, and a community of mentors and peers 
+                who've walked the road before you. No gatekeeping. No guesswork. Just a clear 
+                voyage from potential to power.
+              </p>
             </div>
 
-            {/* Read more button */}
+            {/* CTA to assessment instead of dead link */}
             <div className="mt-8">
-              <Button variant="outline" size="lg" className="group">
-                Read Gbenga's Full Story
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <a href="/about">
+                <Button variant="outline" size="lg" className="group">
+                  Learn More About 3PN
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </a>
             </div>
 
             {/* Signature */}

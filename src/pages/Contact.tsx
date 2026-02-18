@@ -2,8 +2,31 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, MapPin, Send, Linkedin, Twitter, Instagram } from "lucide-react";
+import { Mail, MapPin, Send, Linkedin, Twitter, Instagram, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const faqs = [
+  {
+    q: "What is 3PN and who is it for?",
+    a: "3PN (Professional Network) is a free platform designed for ambitious Black professionals who want to move from potential to power. Whether you're early in your career, pivoting, or levelling up, 3PN gives you diagnostic clarity, curated resources, and a structured pathway to grow."
+  },
+  {
+    q: "What is the CAD Assessment?",
+    a: "The CAD (Clarity, Action, Development) Assessment is our proprietary diagnostic tool. It evaluates your current career stage across three pillars and places you in one of four quadrants — each with a tailored pathway and AI-powered insights to guide your next steps."
+  },
+  {
+    q: "Is 3PN really free?",
+    a: "Yes — completely free. Our mission is to remove barriers, not add them. The assessment, resources, and community access are all free. Premium features like 1-on-1 mentorship matching may have optional tiers in the future."
+  },
+  {
+    q: "How does the mentorship programme work?",
+    a: "Our mentorship programme (coming soon) will match you with experienced professionals based on your quadrant, industry, and career goals. Mentors are vetted leaders who volunteer their time to guide the next generation."
+  },
+  {
+    q: "Can I retake the assessment?",
+    a: "Absolutely. We encourage retaking the assessment as you grow. Your quadrant may change as you develop new skills and systems — that's the whole point. Each assessment gives you updated insights and tracks your progress over time."
+  },
+];
 
 const Contact = () => {
   const { toast } = useToast();
@@ -14,12 +37,12 @@ const Contact = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
     await new Promise((resolve) => setTimeout(resolve, 1000));
     
     toast({
@@ -201,17 +224,49 @@ const Contact = () => {
                     </a>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-                {/* FAQ Teaser */}
-                <div className="mt-10 p-6 bg-gradient-hero rounded-2xl text-primary-foreground">
-                  <h3 className="font-semibold mb-2">Frequently Asked Questions</h3>
-                  <p className="text-primary-foreground/80 text-sm mb-4">
-                    Find quick answers to common questions about our programmes and services.
-                  </p>
-                  <Button variant="heroOutline" size="sm">
-                    View FAQs
-                  </Button>
-                </div>
+        {/* FAQ Section */}
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-12">
+                <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4">
+                  FAQs
+                </span>
+                <h2 className="text-3xl font-bold text-foreground mb-3">Frequently Asked Questions</h2>
+                <p className="text-muted-foreground">Quick answers to common questions about 3PN.</p>
+              </div>
+
+              <div className="space-y-3">
+                {faqs.map((faq, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-border bg-background overflow-hidden transition-all duration-300"
+                  >
+                    <button
+                      onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                      className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="font-medium text-foreground pr-4">{faq.q}</span>
+                      <ChevronDown
+                        className={`w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${
+                          openFaq === i ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        openFaq === i ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
+                      }`}
+                    >
+                      <p className="px-6 pb-5 text-muted-foreground leading-relaxed">{faq.a}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

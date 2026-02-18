@@ -99,10 +99,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
+    const siteUrl = import.meta.env.VITE_APP_URL || window.location.origin;
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `${siteUrl}/dashboard`,
       },
     });
   };

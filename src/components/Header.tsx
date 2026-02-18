@@ -34,7 +34,7 @@ const Header = () => {
             <img 
               src={logo} 
               alt="3PN - Empowering the next generation of Black professionals" 
-              className="h-10 md:h-12 w-auto"
+              className="h-10 md:h-12 w-auto dark:brightness-0 dark:invert"
             />
           </Link>
 
