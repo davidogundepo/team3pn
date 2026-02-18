@@ -24,9 +24,9 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Instagram, href: "#", label: "Instagram" },
+    { icon: Linkedin, href: "https://www.linkedin.com/company/3pn-network", label: "LinkedIn" },
+    { icon: Twitter, href: "https://twitter.com/3pn_network", label: "Twitter" },
+    { icon: Instagram, href: "https://instagram.com/3pn_network", label: "Instagram" },
     { icon: Mail, href: "mailto:hello@3pngroup.com", label: "Email" },
   ];
 
@@ -57,6 +57,8 @@ const Footer = () => {
                 <a
                   key={social.label}
                   href={social.href}
+                  target={social.href.startsWith('mailto:') ? undefined : '_blank'}
+                  rel={social.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
                   aria-label={social.label}
                   className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
                 >

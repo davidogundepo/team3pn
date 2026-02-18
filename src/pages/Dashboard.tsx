@@ -293,8 +293,9 @@ const Dashboard = () => {
                 {/* Avatar */}
                 <div className="relative group">
                   <div 
-                    className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/20 bg-primary/10 flex items-center justify-center cursor-pointer transition-all duration-300 group-hover:border-primary/40 group-hover:shadow-lg group-hover:shadow-primary/10"
+                    className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/20 bg-primary/10 flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10"
                     onClick={() => avatarInputRef.current?.click()}
+                    title="Click to upload profile photo"
                   >
                     {avatarUploading ? (
                       <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -306,7 +307,7 @@ const Dashboard = () => {
                       </span>
                     )}
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary text-primary-foreground rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm">
+                  <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary text-primary-foreground rounded-lg flex items-center justify-center shadow-sm cursor-pointer" onClick={() => avatarInputRef.current?.click()}>
                     <Camera className="w-3.5 h-3.5" />
                   </div>
                   <input
@@ -337,11 +338,12 @@ const Dashboard = () => {
                     ) : (
                       <>
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                          Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋
+                          {assessments.length > 0 ? 'Welcome back' : 'Welcome'}, {profile?.full_name?.split(' ')[0] || 'there'}! 👋
                         </h1>
                         <button
                           onClick={() => { setNameInput(profile?.full_name || ''); setEditingName(true); }}
-                          className="text-muted-foreground hover:text-primary transition-colors"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                          title="Edit your name"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
@@ -384,45 +386,82 @@ const Dashboard = () => {
                         </span>
                       )}
                     </Button>
-                    {showNotifications && (
-                      <div className="absolute right-0 top-12 w-80 bg-card border border-border rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
-                        <div className="p-3 border-b border-border flex items-center justify-between">
-                          <h4 className="font-semibold text-sm">Notifications</h4>
-                          {unreadNotifs > 0 && (
-                            <button onClick={markAllRead} className="text-xs text-primary hover:underline">
-                              Mark all read
-                            </button>
-                          )}
-                        </div>
-                        {notifications.length > 0 ? (
-                          notifications.map(notif => (
-                            <div
-                              key={notif.id}
-                              className={`p-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 transition-colors ${
-                                !notif.read ? 'bg-primary/5' : ''
-                              }`}
-                              onClick={() => markNotificationRead(notif.id)}
-                            >
-                              <div className="flex items-start gap-2">
-                                {!notif.read && <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
-                                <div className={!notif.read ? '' : 'ml-4'}>
-                                  <p className="text-sm font-medium">{notif.title}</p>
-                                  <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {new Date(notif.created_at).toLocaleDateString()}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="p-6 text-center text-sm text-muted-foreground">
-                            No notifications yet
-                          </div>
+                  </div>
+
+              {/* Notification Slide-out Panel */}
+              {showNotifications && (
+                <>
+                  {/* Backdrop */}
+                  <div 
+                    className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[60]" 
+                    onClick={() => setShowNotifications(false)} 
+                  />
+                  {/* Panel */}
+                  <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-card border-l border-border shadow-2xl z-[70] flex flex-col animate-slide-in-right">
+                    {/* Header */}
+                    <div className="p-5 border-b border-border flex items-center justify-between flex-shrink-0">
+                      <div className="flex items-center gap-2">
+                        <Bell className="w-5 h-5 text-primary" />
+                        <h3 className="text-lg font-semibold">Notifications</h3>
+                        {unreadNotifs > 0 && (
+                          <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded-full">
+                            {unreadNotifs} new
+                          </span>
                         )}
                       </div>
-                    )}
+                      <div className="flex items-center gap-2">
+                        {unreadNotifs > 0 && (
+                          <button 
+                            onClick={markAllRead} 
+                            className="text-xs text-primary hover:underline font-medium"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => setShowNotifications(false)} 
+                          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                    {/* Notification List */}
+                    <div className="flex-1 overflow-y-auto">
+                      {notifications.length > 0 ? (
+                        notifications.map(notif => (
+                          <div
+                            key={notif.id}
+                            className={`p-4 border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 transition-colors ${
+                              !notif.read ? 'bg-primary/5' : ''
+                            }`}
+                            onClick={() => markNotificationRead(notif.id)}
+                          >
+                            <div className="flex items-start gap-3">
+                              {!notif.read && <div className="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
+                              <div className={!notif.read ? '' : 'ml-[22px]'}>
+                                <p className="text-sm font-semibold">{notif.title}</p>
+                                <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{notif.message}</p>
+                                <p className="text-xs text-muted-foreground/70 mt-2">
+                                  {new Date(notif.created_at).toLocaleDateString('en-US', { 
+                                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full p-12 text-center">
+                          <Bell className="w-12 h-12 text-muted-foreground/30 mb-4" />
+                          <p className="text-sm font-medium text-muted-foreground">All caught up!</p>
+                          <p className="text-xs text-muted-foreground/70 mt-1">No notifications yet</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
+                </>
+              )}
                   <Button variant="outline" onClick={signOut} className="rounded-xl">
                     Sign Out
                   </Button>
