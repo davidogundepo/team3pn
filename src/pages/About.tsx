@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatWeOffer from "@/components/WhatWeOffer";
@@ -93,6 +95,7 @@ const team = [
 const About = () => {
   const [expandedMember, setExpandedMember] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: "", email: "" });
+  const navigate = useNavigate();
 
   const toggleMember = (name: string) => {
     setExpandedMember(expandedMember === name ? null : name);
@@ -100,9 +103,11 @@ const About = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
+    toast.success('Welcome to the community! 🎉', {
+      description: 'Create an account to access all 3PN resources.',
+    });
     setFormData({ name: "", email: "" });
+    setTimeout(() => navigate('/login'), 1500);
   };
 
   return (
