@@ -24,7 +24,29 @@ import {
   Users,
   Clock,
   Zap,
+  Bell,
+  Trophy,
+  Star,
+  Flame,
+  Crown,
 } from 'lucide-react';
+
+interface Milestone {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  achieved_at: string;
+}
+
+interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+}
 
 interface AssessmentResult {
   id: string;
@@ -78,6 +100,9 @@ const Dashboard = () => {
   const [assessments, setAssessments] = useState<AssessmentResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -110,6 +135,26 @@ const Dashboard = () => {
         .order('completed_at', { ascending: false });
 
       setAssessments(assessmentData || []);
+
+      // Load milestones
+      const { data: milestoneData } = await supabase
+        .from('milestones')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('achieved_at', { ascending: false });
+
+      setMilestones(milestoneData || []);
+
+      // Load notifications
+      const { data: notifData } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user?.id)
+        .eq('for_admin', false)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      setNotifications(notifData || []);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -123,6 +168,31 @@ const Dashboard = () => {
 
   const latestAssessment = assessments[0];
   const hasAssessment = assessments.length > 0;
+  const unreadNotifs = notifications.filter(n => !n.read).length;
+
+  const markNotificationRead = async (id: string) => {
+    await supabase.from('notifications').update({ read: true }).eq('id', id);
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+
+  const markAllRead = async () => {
+    const ids = notifications.filter(n => !n.read).map(n => n.id);
+    if (ids.length > 0) {
+      await supabase.from('notifications').update({ read: true }).in('id', ids);
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    }
+  };
+
+  const getMilestoneIcon = (type: string) => {
+    switch (type) {
+      case 'first_assessment': return <Rocket className="w-5 h-5 text-blue-500" />;
+      case 'reached_q4': return <Crown className="w-5 h-5 text-purple-500" />;
+      case 'readiness_above_75': return <Flame className="w-5 h-5 text-orange-500" />;
+      case 'quadrant_upgrade': return <TrendingUp className="w-5 h-5 text-green-500" />;
+      case 'all_pillars_above_50': return <Star className="w-5 h-5 text-yellow-500" />;
+      default: return <Trophy className="w-5 h-5 text-primary" />;
+    }
+  };
 
   // Extract pillar scores from latest assessment
   const pillarScores = latestAssessment?.cad_results?.pillarScores || {
@@ -157,9 +227,65 @@ const Dashboard = () => {
                   Here's your CAD Diagnostic dashboard
                 </p>
               </div>
-              <Button variant="outline" onClick={signOut}>
-                Sign Out
-              </Button>
+              <div className="flex items-center gap-3">
+                {/* Notification Bell */}
+                <div className="relative">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative"
+                  >
+                    <Bell className="w-4 h-4" />
+                    {unreadNotifs > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                        {unreadNotifs}
+                      </span>
+                    )}
+                  </Button>
+                  {showNotifications && (
+                    <div className="absolute right-0 top-12 w-80 bg-card border border-border rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
+                      <div className="p-3 border-b border-border flex items-center justify-between">
+                        <h4 className="font-semibold text-sm">Notifications</h4>
+                        {unreadNotifs > 0 && (
+                          <button onClick={markAllRead} className="text-xs text-primary hover:underline">
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+                      {notifications.length > 0 ? (
+                        notifications.map(notif => (
+                          <div
+                            key={notif.id}
+                            className={`p-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 transition-colors ${
+                              !notif.read ? 'bg-primary/5' : ''
+                            }`}
+                            onClick={() => markNotificationRead(notif.id)}
+                          >
+                            <div className="flex items-start gap-2">
+                              {!notif.read && <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
+                              <div className={!notif.read ? '' : 'ml-4'}>
+                                <p className="text-sm font-medium">{notif.title}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {new Date(notif.created_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-6 text-center text-sm text-muted-foreground">
+                          No notifications yet
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <Button variant="outline" onClick={signOut}>
+                  Sign Out
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -236,6 +362,7 @@ const Dashboard = () => {
             <Tabs defaultValue="overview" className="space-y-6">
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="progress">Progress</TabsTrigger>
                 <TabsTrigger value="insights">AI Insights</TabsTrigger>
                 <TabsTrigger value="history">History</TabsTrigger>
                 <TabsTrigger value="actions">Action Plan</TabsTrigger>
@@ -362,6 +489,145 @@ const Dashboard = () => {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Progress & Milestones Tab */}
+              <TabsContent value="progress" className="space-y-6">
+                {/* Journey Progress */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-primary" />
+                      Your Mastery Voyage Journey
+                    </CardTitle>
+                    <CardDescription>
+                      Track your progress from Point A (Potential) to Point B (Power)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2 mb-6">
+                      {[1, 2, 3, 4].map((q) => {
+                        const info = quadrantInfo[q];
+                        const QuadIcon = info.icon;
+                        const isCurrentOrPast = latestAssessment && latestAssessment.quadrant >= q;
+                        const isCurrent = latestAssessment && latestAssessment.quadrant === q;
+                        return (
+                          <div key={q} className="flex-1">
+                            <div className={`relative flex flex-col items-center p-3 rounded-xl border-2 transition-all ${
+                              isCurrent
+                                ? 'border-primary bg-primary/5 shadow-md'
+                                : isCurrentOrPast
+                                ? 'border-green-500/50 bg-green-50 dark:bg-green-900/10'
+                                : 'border-border bg-muted/30'
+                            }`}>
+                              {isCurrent && (
+                                <span className="absolute -top-2 -right-2 text-lg">📍</span>
+                              )}
+                              <QuadIcon className={`w-6 h-6 mb-1 ${isCurrent ? info.color : isCurrentOrPast ? 'text-green-500' : 'text-muted-foreground'}`} />
+                              <span className={`text-xs font-semibold ${isCurrent ? 'text-primary' : 'text-muted-foreground'}`}>
+                                Q{q}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground text-center mt-0.5">
+                                {info.title.replace(/Q\d:\s/, '')}
+                              </span>
+                            </div>
+                            {q < 4 && (
+                              <div className={`h-0.5 mt-3 mx-1 rounded ${isCurrentOrPast ? 'bg-green-500' : 'bg-border'}`} />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {latestAssessment?.cad_results?.readinessForQ4 != null && (
+                      <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm font-medium">Overall Readiness for Mastery</span>
+                          <span className="text-sm font-bold text-primary">
+                            {latestAssessment.cad_results.readinessForQ4.toFixed(1)}%
+                          </span>
+                        </div>
+                        <Progress value={latestAssessment.cad_results.readinessForQ4} />
+                      </div>
+                    )}
+                    {assessments.length > 1 && (
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Assessments taken:</strong> {assessments.length} &nbsp;·&nbsp;
+                          <strong>First:</strong> {new Date(assessments[assessments.length - 1].completed_at).toLocaleDateString()} &nbsp;·&nbsp;
+                          <strong>Latest:</strong> {new Date(assessments[0].completed_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Milestones */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-amber-500" />
+                      Achievements & Milestones
+                    </CardTitle>
+                    <CardDescription>
+                      Badges you've earned on your journey
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {milestones.length > 0 ? (
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {milestones.map((milestone) => (
+                          <div
+                            key={milestone.id}
+                            className="flex items-start gap-3 p-4 rounded-xl border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="p-2 rounded-lg bg-card border border-border">
+                              {getMilestoneIcon(milestone.type)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm">{milestone.title}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">{milestone.description}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {new Date(milestone.achieved_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Trophy className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                        <p className="text-muted-foreground text-sm">No milestones yet.</p>
+                        <p className="text-muted-foreground text-xs mt-1">
+                          Complete your first assessment to earn badges!
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Quick Stats */}
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <div className="text-3xl font-bold text-primary">{assessments.length}</div>
+                      <p className="text-sm text-muted-foreground mt-1">Assessments Taken</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <div className="text-3xl font-bold text-amber-500">{milestones.length}</div>
+                      <p className="text-sm text-muted-foreground mt-1">Milestones Earned</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <div className="text-3xl font-bold text-green-500">
+                        {latestAssessment?.cad_results?.readinessForQ4?.toFixed(0) || '0'}%
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">Mastery Readiness</p>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
 
               <TabsContent value="insights">

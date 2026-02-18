@@ -7,7 +7,8 @@ import { supabase } from "@/lib/supabase";
 import { 
   Users, FileText, TrendingUp, 
   LogOut, Home, BarChart3, Loader2,
-  ArrowUpRight, Shield, Compass, Target
+  ArrowUpRight, Shield, Compass, Target,
+  Bell, CheckCheck
 } from "lucide-react";
 
 interface AssessmentRecord {
@@ -24,6 +25,16 @@ interface ProfileRecord {
   id: string;
   email: string;
   full_name: string | null;
+  created_at: string;
+}
+
+interface AdminNotification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  metadata: any;
+  read: boolean;
   created_at: string;
 }
 
@@ -116,6 +127,8 @@ const AdminDashboard = ({ onLogout }: { onLogout: () => void }) => {
   const [recentAssessments, setRecentAssessments] = useState<AssessmentRecord[]>([]);
   const [quadrantDistribution, setQuadrantDistribution] = useState<Record<number, number>>({ 1: 0, 2: 0, 3: 0, 4: 0 });
   const [avgReadiness, setAvgReadiness] = useState(0);
+  const [adminNotifs, setAdminNotifs] = useState<AdminNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     fetchDashboardData();
@@ -163,10 +176,30 @@ const AdminDashboard = ({ onLogout }: { onLogout: () => void }) => {
         setQuadrantDistribution(dist);
         setAvgReadiness(readinessCount > 0 ? totalReadiness / readinessCount : 0);
       }
+
+      // Fetch admin notifications
+      const { data: notifs } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('for_admin', true)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      setAdminNotifs((notifs as AdminNotification[]) || []);
+      setUnreadCount((notifs || []).filter((n: any) => !n.read).length);
     } catch (error) {
       console.error('Error fetching admin data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const markAllNotificationsRead = async () => {
+    const unreadIds = adminNotifs.filter(n => !n.read).map(n => n.id);
+    if (unreadIds.length > 0) {
+      await supabase.from('notifications').update({ read: true }).in('id', unreadIds);
+      setAdminNotifs(prev => prev.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
     }
   };
 
@@ -367,6 +400,66 @@ const AdminDashboard = ({ onLogout }: { onLogout: () => void }) => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Admin Notification Feed */}
+        <div className="mt-8 bg-card rounded-xl border border-border shadow-soft">
+          <div className="p-6 border-b border-border flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Activity Feed</h3>
+              {unreadCount > 0 && (
+                <span className="px-2 py-0.5 bg-primary text-primary-foreground text-xs rounded-full">
+                  {unreadCount} new
+                </span>
+              )}
+            </div>
+            {unreadCount > 0 && (
+              <Button variant="ghost" size="sm" onClick={markAllNotificationsRead}>
+                <CheckCheck className="w-4 h-4 mr-1" />
+                Mark all read
+              </Button>
+            )}
+          </div>
+          <div className="divide-y divide-border max-h-96 overflow-y-auto">
+            {adminNotifs.length > 0 ? (
+              adminNotifs.map((notif) => (
+                <div
+                  key={notif.id}
+                  className={`p-4 hover:bg-muted/50 transition-colors ${
+                    !notif.read ? 'bg-primary/5 border-l-4 border-l-primary' : ''
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${
+                      notif.type === 'admin_new_signup'
+                        ? 'bg-blue-100 dark:bg-blue-900/30'
+                        : 'bg-green-100 dark:bg-green-900/30'
+                    }`}>
+                      {notif.type === 'admin_new_signup'
+                        ? <Users className="w-4 h-4 text-blue-600" />
+                        : <FileText className="w-4 h-4 text-green-600" />
+                      }
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm ${!notif.read ? 'font-semibold' : 'font-medium'} text-foreground`}>
+                        {notif.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(notif.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-8 text-center text-muted-foreground">
+                <Bell className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                <p>No activity yet. Notifications will appear here when users sign up and complete assessments.</p>
+              </div>
+            )}
           </div>
         </div>
 
