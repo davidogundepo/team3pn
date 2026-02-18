@@ -218,7 +218,7 @@ export async function generateCareerGuidance(
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
 
     const systemPrompt = `You are a supportive career coach for young professionals in the 3PN (Prepare, Progress, and Prosper Network) program. 
     
@@ -299,7 +299,7 @@ export async function generateDashboardInsight(context: {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
 
     const prompt = context.hasAssessment
       ? `You are a sharp, insightful AI career coach for the 3PN platform. Generate a fresh, personalised dashboard insight for this user.
@@ -391,7 +391,7 @@ export async function generateAssessmentNudge(
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
 
     const prompt = `You are a warm, sharp AI coach guiding someone through a career assessment on the 3PN platform.
 
