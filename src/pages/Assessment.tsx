@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { generatePersonalizedInsights } from "@/lib/gemini";
+import { generatePersonalizedInsights, generateAssessmentNudge } from "@/lib/gemini";
 import { assessmentQuestions, calculateQuadrant, QuestionOption, QuadrantLevel, Pillar } from "@/lib/assessmentData";
 import { ArrowRight, ArrowLeft, CheckCircle, Rocket, TrendingUp, HeartHandshake, Clock, Zap, Target, Loader2, Sparkles, Download, Mail, Share2 } from "lucide-react";
 import jsPDF from 'jspdf';
@@ -112,6 +112,8 @@ const Assessment = () => {
   const [aiInsights, setAiInsights] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [aiNudge, setAiNudge] = useState<string | null>(null);
+  const [aiNudgeLoading, setAiNudgeLoading] = useState(false);
   const [savedProgress, setSavedProgress] = useState<{ question: number; answers: Record<number, QuestionOption>; answeredCount: number } | null>(null);
 
   // Auth guard — must be logged in to take assessment
@@ -185,6 +187,20 @@ const Assessment = () => {
   const handleAnswer = (option: QuestionOption) => {
     const newAnswers = { ...answers, [currentQuestion]: option };
     setAnswers(newAnswers);
+
+    // Fire AI nudge for next question (non-blocking)
+    const currentQ = assessmentQuestions[currentQuestion];
+    setAiNudgeLoading(true);
+    generateAssessmentNudge(
+      currentQuestion,
+      assessmentQuestions.length,
+      currentQ.pillar,
+      currentQ.quality,
+      option.label,
+    ).then(nudge => {
+      setAiNudge(nudge);
+      setAiNudgeLoading(false);
+    }).catch(() => setAiNudgeLoading(false));
 
     if (currentQuestion < assessmentQuestions.length - 1) {
       const nextQ = currentQuestion + 1;
@@ -706,6 +722,22 @@ const Assessment = () => {
                   />
                 </div>
               </div>
+
+              {/* AI Companion Nudge */}
+              {(aiNudge || aiNudgeLoading) && currentQuestion > 0 && (
+                <div className="mb-6 flex items-start gap-3 bg-gradient-to-r from-primary/5 to-purple-500/5 border border-primary/10 rounded-xl p-4 text-left transition-all">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {aiNudgeLoading ? (
+                      <p className="text-sm text-muted-foreground animate-pulse">Reflecting on your answer...</p>
+                    ) : (
+                      <p className="text-sm text-foreground/80 leading-relaxed">{aiNudge}</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Question */}
               <div className="text-center mb-10">

@@ -249,3 +249,178 @@ ${userContext?.name ? `- Address them as ${userContext.name}` : ''}`;
     return getRelevantResponse(question);
   }
 }
+
+// Dashboard AI Insight types
+export interface DashboardInsight {
+  recommendation: string;
+  actionStep: string;
+  reflection: string;
+}
+
+// Generate a fresh AI insight for the dashboard
+export async function generateDashboardInsight(context: {
+  quadrant?: number;
+  pathway?: string;
+  pillarScores?: Record<string, number>;
+  userName?: string;
+  hasAssessment: boolean;
+}): Promise<DashboardInsight> {
+  // Fallback content
+  const fallbacks: Record<number, DashboardInsight> = {
+    0: {
+      recommendation: "Every expert was once a beginner. The fact that you're here means you're already ahead of most people who never take the first step.",
+      actionStep: "Take the free 5-minute diagnostic to discover your starting point. No wrong answers, just clarity.",
+      reflection: "Clarity beats motivation. Most people stay stuck not because they lack drive, but because they don't know where to direct it.",
+    },
+    1: {
+      recommendation: "You're at the beginning of something powerful. Focus on building one core skill deeply rather than spreading yourself thin.",
+      actionStep: "Pick one skill from your assessment and dedicate 30 minutes daily to it this week.",
+      reflection: "The gap between where you are and where you want to be is simply a system. Start documenting what works for you.",
+    },
+    2: {
+      recommendation: "You have both awareness and structure working for you. Your next step is building independence and internal command.",
+      actionStep: "Identify one area where you've been waiting for approval and take ownership of it today.",
+      reflection: "Your system is your superpower, but don't let it become a crutch. The leaders who break through can operate with and without structure.",
+    },
+    3: {
+      recommendation: "You've got command but no system to scale it. You're making things happen, but you're probably burning energy that could be automated.",
+      actionStep: "Write down the 3 tasks you repeat most. Find a way to template or automate at least one this week.",
+      reflection: "Your independence is a strength, but sustainable success requires building systems around yourself.",
+    },
+    4: {
+      recommendation: "You're operating at the highest level. Your focus now should be on legacy: mentoring others and expanding your impact beyond yourself.",
+      actionStep: "Reach out to one person who's earlier in their journey and offer to share what you've learned.",
+      reflection: "At your level, the biggest risk is complacency. Stay hungry by setting a goal in a completely new domain.",
+    },
+  };
+
+  if (!import.meta.env.VITE_GEMINI_API_KEY) {
+    return fallbacks[context.quadrant || 0];
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const prompt = context.hasAssessment
+      ? `You are a sharp, insightful AI career coach for the 3PN platform. Generate a fresh, personalised dashboard insight for this user.
+
+User: ${context.userName || 'Professional'}
+Their Quadrant: Q${context.quadrant} (${context.quadrant === 1 ? 'The New Traveler: Awareness + No System' : context.quadrant === 2 ? 'The Steady Support: Awareness + System' : context.quadrant === 3 ? 'The Independent Starter: Command + No System' : 'Systemic Leverage Peak: Command + System'})
+Pathway: ${context.pathway || 'Not specified'}
+Pillar Scores: ${context.pillarScores ? Object.entries(context.pillarScores).map(([k, v]) => `${k}: ${v}/80`).join(', ') : 'Not available'}
+
+Rules:
+- Be warm but direct. No fluff.
+- Reference their specific quadrant situation
+- If a pillar score is notably low, address it specifically
+- Keep it under 60 words per field
+- Don't use em dashes
+
+Return ONLY valid JSON with exactly these keys:
+- "recommendation": One personalised observation about where they are and what to focus on (2-3 sentences max)
+- "actionStep": One specific, actionable thing they can do TODAY (1 sentence)
+- "reflection": A thought-provoking insight about growth that feels personal to their stage (1-2 sentences)`
+      : `You are a sharp, insightful AI career coach for the 3PN platform. Generate a motivating dashboard insight for a new user named ${context.userName || 'there'} who hasn't taken their assessment yet.
+
+Rules:
+- Be warm but direct. No fluff.
+- Motivate them to take the free 5-minute diagnostic
+- Make them feel like taking the first step is powerful
+- Keep it under 60 words per field
+- Don't use em dashes
+
+Return ONLY valid JSON with exactly these keys:
+- "recommendation": A warm, motivating observation about why self-knowledge matters (2-3 sentences max)
+- "actionStep": A nudge to take the free diagnostic right now (1 sentence)
+- "reflection": A thought-provoking insight about starting (1-2 sentences)`;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        maxOutputTokens: 300,
+        temperature: 0.9,
+      },
+    });
+
+    const text = result.response.text();
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(cleaned) as DashboardInsight;
+  } catch (error) {
+    console.error('Dashboard AI insight error:', error);
+    return fallbacks[context.quadrant || 0];
+  }
+}
+
+// Assessment AI companion nudges
+const pillarNudges: Record<string, string[]> = {
+  Capability: [
+    "Knowing yourself is the foundation. Every great leader started by understanding their own wiring.",
+    "Oprah once said she succeeded because she became genuinely curious about herself first. Self-awareness is your starting advantage.",
+    "You're building your internal compass. That clarity will guide every decision ahead.",
+  ],
+  Competence: [
+    "Skills are built, not born. Every expert was once a beginner who refused to stop practising.",
+    "Kobe Bryant wasn't the most talented player in his draft class. But his obsession with skill-building made him legendary.",
+    "Competence is the bridge between potential and performance. You're laying down the planks right now.",
+  ],
+  Character: [
+    "Character is what you do when no one is watching. It's the pillar that holds everything else up.",
+    "Chimamanda Ngozi Adichie built her career on authenticity, not trends. Character compounds over time.",
+    "Trust is earned in drops and lost in buckets. Your character answers are shaping the most important pillar.",
+  ],
+  Capacity: [
+    "Capacity is about scaling yourself. It's not just what you can do, but how far your impact reaches.",
+    "Jay-Z went from selling out concerts to building Roc Nation. The difference? He learned to multiply his capacity.",
+    "You're thinking about leverage now. That's the shift from doing more to achieving more.",
+  ],
+};
+
+export async function generateAssessmentNudge(
+  questionNumber: number,
+  totalQuestions: number,
+  pillar: string,
+  quality: string,
+  chosenOptionLabel: string,
+): Promise<string> {
+  // Fallback: pick from curated nudges
+  const fallbackNudges = pillarNudges[pillar] || pillarNudges.Capability;
+  const fallback = fallbackNudges[questionNumber % fallbackNudges.length];
+
+  if (!import.meta.env.VITE_GEMINI_API_KEY) {
+    return fallback;
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const prompt = `You are a warm, sharp AI coach guiding someone through a career assessment on the 3PN platform.
+
+They just answered question ${questionNumber + 1} of ${totalQuestions}.
+Pillar: ${pillar}
+Quality being measured: ${quality}
+Their answer: "${chosenOptionLabel}"
+
+Write ONE short reflection (max 2 sentences, under 30 words total). Be captivating, not generic.
+
+Rules:
+- About 30% of the time, naturally reference a famous person who relates to this topic (Oprah, Denzel Washington, Kobe Bryant, Chimamanda Ngozi Adichie, Steve Jobs, Michelle Obama, Aliko Dangote, Jay-Z, Elon Musk, Folorunso Alakija). When you do, make it feel organic, not forced.
+- The other 70%, just speak directly and insightfully without mentioning anyone.
+- Never use em dashes.
+- Don't be preachy or generic. Be specific to what they chose.
+- If they're past question 15, add encouragement about being close to finishing.
+- Return ONLY the reflection text, no quotes, no JSON.`;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        maxOutputTokens: 60,
+        temperature: 1.0,
+      },
+    });
+
+    const text = result.response.text().trim();
+    return text || fallback;
+  } catch {
+    return fallback;
+  }
+}

@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/lib/supabase';
+import { generateDashboardInsight, DashboardInsight } from '@/lib/gemini';
 import {
   Rocket,
   TrendingUp,
@@ -97,6 +98,80 @@ const quadrantInfo: Record<number, {
   },
 };
 
+// AI Insight data: curated per-quadrant recommendations + inspirational figures
+const aiInsights: Record<number, {
+  recommendation: string;
+  actionStep: string;
+  figure: { name: string; story: string; emoji: string };
+}[]> = {
+  1: [
+    {
+      recommendation: "You're at the beginning of something powerful. Right now, your biggest asset is your openness to learning. Focus on building one core skill deeply rather than spreading yourself thin.",
+      actionStep: "Pick one skill from your assessment and dedicate 30 minutes daily to it this week.",
+      figure: { name: "Oprah Winfrey", story: "Started with no connections or roadmap. She focused on one thing: becoming genuinely curious about people. That single focus built an empire.", emoji: "🌟" },
+    },
+    {
+      recommendation: "You have awareness, which most people never develop. The gap between where you are and where you want to be is simply a system. Start documenting what works for you.",
+      actionStep: "Create a simple daily routine around your strongest pillar and stick with it for 7 days.",
+      figure: { name: "Denzel Washington", story: "Was rejected from graduate school and had no industry connections. He committed to mastering his craft one role at a time, building awareness into command.", emoji: "🎬" },
+    },
+  ],
+  2: [
+    {
+      recommendation: "You have both awareness and structure working for you. Your next step is building independence. Start making decisions without waiting for permission or validation.",
+      actionStep: "Identify one area where you've been waiting for approval and take ownership of it today.",
+      figure: { name: "Kobe Bryant", story: "Already had talent and a system (NBA coaching). What separated him was his obsession with independent study. He watched more film than any other player, turning good support into personal command.", emoji: "🏀" },
+    },
+    {
+      recommendation: "Your system is your superpower, but don't let it become a crutch. The leaders who break through are the ones who can operate with and without structure.",
+      actionStep: "This week, try solving a challenge without your usual process. Trust your instincts.",
+      figure: { name: "Chimamanda Ngozi Adichie", story: "Had a strong academic system but chose to step outside it to write stories the world wasn't expecting. That leap from structure to creative independence made her a global voice.", emoji: "📚" },
+    },
+  ],
+  3: [
+    {
+      recommendation: "You've got command but no system to scale it. You're the person who can make things happen, but you're probably burning energy on things that could be automated or delegated.",
+      actionStep: "Write down the 3 tasks you repeat most. Find a way to template or automate at least one.",
+      figure: { name: "Elon Musk", story: "Had raw command and bold ideas, but SpaceX only worked when he built a system around his vision. Hiring the right people and creating processes turned ambition into results.", emoji: "🚀" },
+    },
+    {
+      recommendation: "Your independence is a strength, but sustainable success requires building systems around yourself. The best leaders aren't solo heroes; they create ecosystems.",
+      actionStep: "Find one person this week who complements your weaknesses. Start a conversation.",
+      figure: { name: "Aliko Dangote", story: "Started as an independent trader with pure hustle. His breakthrough came when he stopped doing everything alone and built systems for manufacturing and distribution across Africa.", emoji: "🏗️" },
+    },
+  ],
+  4: [
+    {
+      recommendation: "You're operating at the highest level. Your focus now should be on legacy: mentoring others, sharing your system, and expanding your impact beyond yourself.",
+      actionStep: "Reach out to one person who's earlier in their journey and offer to share what you've learned.",
+      figure: { name: "Jay-Z", story: "Reached the top of music, then built Roc Nation to put others on. Going from personal success to systemic impact is the final evolution.", emoji: "👑" },
+    },
+    {
+      recommendation: "At your level, the biggest risk is complacency. Stay hungry by setting a goal in a completely new domain. The skills that got you here will transfer.",
+      actionStep: "Identify an area outside your expertise that excites you. Take one step into it today.",
+      figure: { name: "Folorunso Alakija", story: "Dominated fashion, then pivoted to oil and gas, then philanthropy. Each leap multiplied her impact because she carried her system into new arenas.", emoji: "💎" },
+    },
+  ],
+};
+
+const newUserInsights = [
+  {
+    recommendation: "Every expert was once a beginner. The fact that you're here means you're already ahead of 90% of people who never take the first step.",
+    actionStep: "Take the free 5-minute diagnostic to discover your starting point. No wrong answers.",
+    figure: { name: "Steve Jobs", story: "Dropped out of college with no plan. He later said, 'You can't connect the dots looking forward.' Your first step is just collecting dots.", emoji: "🍎" },
+  },
+  {
+    recommendation: "Clarity beats motivation. Most people stay stuck not because they lack drive, but because they don't know where to direct it. That's exactly what the diagnostic reveals.",
+    actionStep: "Take the assessment now. It takes 5 minutes and the insights will surprise you.",
+    figure: { name: "Michelle Obama", story: "Before becoming a global icon, she spent years figuring out what she actually wanted. Self-assessment and honest reflection turned confusion into crystal-clear purpose.", emoji: "✨" },
+  },
+];
+
+const getDailyInsightIndex = (items: any[]) => {
+  const day = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+  return day % items.length;
+};
+
 const Dashboard = () => {
   const { user, signOut, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -110,6 +185,8 @@ const Dashboard = () => {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [aiInsight, setAiInsight] = useState<DashboardInsight | null>(null);
+  const [aiInsightLoading, setAiInsightLoading] = useState(true);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -202,6 +279,19 @@ const Dashboard = () => {
 
       setAssessments(assessmentData || []);
 
+      // Pre-fetch AI insight (runs in parallel with remaining queries)
+      const latestA = assessmentData?.[0];
+      const aiPromise = generateDashboardInsight({
+        quadrant: latestA?.cad_results?.dominantQuadrant,
+        pathway: latestA?.cad_results?.strategicPathway,
+        pillarScores: latestA?.cad_results?.pillarScores,
+        userName: profileData?.full_name?.split(' ')[0],
+        hasAssessment: (assessmentData || []).length > 0,
+      }).then(insight => {
+        setAiInsight(insight);
+        setAiInsightLoading(false);
+      }).catch(() => setAiInsightLoading(false));
+
       // Load milestones
       const { data: milestoneData } = await supabase
         .from('milestones')
@@ -221,6 +311,7 @@ const Dashboard = () => {
         .limit(10);
 
       setNotifications(notifData || []);
+      await aiPromise; // ensure AI is done before we stop loading
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -469,6 +560,80 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+
+          {/* AI Insight Card */}
+          {aiInsight && !aiInsightLoading && (
+            <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-purple-500/5 p-6 mb-8 shadow-lg">
+              {/* Decorative sparkles */}
+              <div className="absolute top-3 right-4 text-primary/20 text-2xl animate-pulse">✦</div>
+              <div className="absolute bottom-4 left-6 text-purple-400/20 text-lg" style={{ animationDelay: '1s' }}>✦</div>
+              
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center flex-shrink-0 shadow-md">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-primary flex items-center gap-1.5">
+                    AI Insight
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10">Fresh</span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground">Personalised for you</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-5">
+                {/* Left: AI Recommendation */}
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm leading-relaxed text-foreground/90">{aiInsight.recommendation}</p>
+                  </div>
+                  <div className="flex items-start gap-2 bg-primary/5 rounded-xl p-3">
+                    <span className="text-primary font-bold text-sm mt-0.5">→</span>
+                    <div>
+                      <p className="text-xs font-semibold text-primary mb-0.5">Today's Action</p>
+                      <p className="text-sm text-foreground/80">{aiInsight.actionStep}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Reflection + Famous Figure */}
+                <div className="space-y-4">
+                  <div className="bg-muted/50 rounded-xl p-4 border border-border/50">
+                    <p className="text-xs font-semibold text-muted-foreground mb-1.5">Reflection</p>
+                    <p className="text-sm italic leading-relaxed text-foreground/80">"{aiInsight.reflection}"</p>
+                  </div>
+                  {(() => {
+                    const q = latestAssessment?.cad_results?.dominantQuadrant || 0;
+                    const figures = q > 0 ? (aiInsights[q] || []) : newUserInsights;
+                    if (figures.length === 0) return null;
+                    const fig = figures[getDailyInsightIndex(figures)].figure;
+                    return (
+                      <div className="flex items-start gap-3 px-1">
+                        <span className="text-2xl">{fig.emoji}</span>
+                        <div>
+                          <p className="text-xs font-bold text-foreground">{fig.name}</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">{fig.story}</p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* AI Insight Loading State */}
+          {aiInsightLoading && (
+            <div className="rounded-2xl border border-primary/10 bg-card p-6 mb-8 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center flex-shrink-0 animate-pulse">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Generating your AI insight...</p>
+                <p className="text-xs text-muted-foreground">Personalised just for you</p>
+              </div>
+            </div>
+          )}
 
           {/* Main Content */}
           {!hasAssessment ? (
