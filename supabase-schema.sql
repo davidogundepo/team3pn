@@ -1,5 +1,5 @@
--- 3PN Self-Assessment Database Schema
--- Run this in your Supabase SQL Editor
+-- 3PN CAD Diagnostic Database Schema
+-- Run this in your Supabase SQL Editor (https://supabase.com/dashboard → SQL Editor)
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -27,13 +27,19 @@ CREATE POLICY "Users can update own profile"
   FOR UPDATE
   USING (auth.uid() = id);
 
--- Assessments table
+CREATE POLICY "Users can insert own profile"
+  ON public.profiles
+  FOR INSERT
+  WITH CHECK (auth.uid() = id);
+
+-- Assessments table (CAD Quadrant model)
 CREATE TABLE IF NOT EXISTS public.assessments (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-  stage TEXT NOT NULL CHECK (stage IN ('know-yourself', 'build-yourself', 'multiply-impact')),
+  quadrant INTEGER NOT NULL CHECK (quadrant BETWEEN 1 AND 4),
+  pathway TEXT NOT NULL,
   responses JSONB NOT NULL,
-  scores JSONB NOT NULL,
+  cad_results JSONB NOT NULL,
   ai_insights JSONB,
   completed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -125,12 +131,12 @@ CREATE TRIGGER update_mentor_matches_updated_at
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_assessments_user_id ON public.assessments(user_id);
-CREATE INDEX IF NOT EXISTS idx_assessments_stage ON public.assessments(stage);
+CREATE INDEX IF NOT EXISTS idx_assessments_quadrant ON public.assessments(quadrant);
 CREATE INDEX IF NOT EXISTS idx_assessments_completed_at ON public.assessments(completed_at DESC);
 CREATE INDEX IF NOT EXISTS idx_mentor_matches_mentee_id ON public.mentor_matches(mentee_id);
 CREATE INDEX IF NOT EXISTS idx_mentor_matches_mentor_id ON public.mentor_matches(mentor_id);
 CREATE INDEX IF NOT EXISTS idx_mentor_matches_status ON public.mentor_matches(status);
 
 COMMENT ON TABLE public.profiles IS 'User profile information extending auth.users';
-COMMENT ON TABLE public.assessments IS 'Career self-assessment results with AI insights';
+COMMENT ON TABLE public.assessments IS 'CAD Diagnostic assessment results with AI insights';
 COMMENT ON TABLE public.mentor_matches IS 'Mentor-mentee matching relationships';

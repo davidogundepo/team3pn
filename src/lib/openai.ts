@@ -1,10 +1,7 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { CADAssessmentResults, QuadrantLevel } from './assessmentData';
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
-  dangerouslyAllowBrowser: true // For demo purposes - move to backend in production
-});
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
 export interface CADResponse {
   questionId: number;
@@ -27,7 +24,14 @@ export async function generatePersonalizedInsights(
   responses: CADResponse[],
   userProfile?: { name?: string; email?: string }
 ): Promise<PersonalizedInsights> {
+  // If no API key, use built-in insights immediately
+  if (!import.meta.env.VITE_GEMINI_API_KEY) {
+    return getFallbackInsights(cadResults.dominantQuadrant, cadResults.strategicPathway);
+  }
+
   try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
     const prompt = `You are a professional career coach specializing in the CAD Diagnostic framework (Capability, Competence, Character, Capacity). Based on an assessment, provide personalized insights.
 
 CAD Assessment Results:
@@ -53,36 +57,25 @@ ${Object.entries(cadResults.pillarScores).map(([pillar, score]) => `- ${pillar}:
 Response Distribution:
 ${Object.entries(cadResults.quadrantCounts).map(([q, count]) => `Q${q}: ${count} responses`).join(', ')}
 
-Please provide:
-1. A warm, encouraging summary (2-3 sentences) explaining their quadrant position in the CAD framework
-2. List 3 key strengths they demonstrated across the 3Cs + Capacity
-3. List 3 specific areas for growth to progress toward Q4 (Mastery)
-4. Provide 4 actionable next steps tailored to their strategic pathway
-5. A motivational message (1-2 sentences) using the "un-outsourcing" philosophy
+Please provide a JSON response with these exact keys:
+- "summary": A warm, encouraging summary (2-3 sentences) explaining their quadrant position
+- "strengths": Array of 3 key strengths they demonstrated
+- "areasForGrowth": Array of 3 specific areas for growth toward Q4 (Mastery)
+- "actionSteps": Array of 4 actionable next steps for their strategic pathway
+- "motivationalMessage": A motivational message (1-2 sentences) using the "un-outsourcing" philosophy
 
-Format your response as JSON with keys: summary, strengths (array), areasForGrowth (array), actionSteps (array), motivationalMessage`;
+Return ONLY valid JSON, no markdown formatting.`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert career coach specializing in the CAD Diagnostic framework. Help professionals transition from Point A (potential) to Point B (power) through "un-outsourcing" their development.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      response_format: { type: 'json_object' }
-    });
-
-    const insights = JSON.parse(completion.choices[0].message.content || '{}');
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+    
+    // Clean the response - remove markdown code blocks if present
+    const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const insights = JSON.parse(cleanedText);
     return insights as PersonalizedInsights;
   } catch (error) {
     console.error('Error generating AI insights:', error);
-    // Fallback to default insights
     return getFallbackInsights(cadResults.dominantQuadrant, cadResults.strategicPathway);
   }
 }
@@ -174,11 +167,59 @@ function getFallbackInsights(quadrant: QuadrantLevel, pathway: string): Personal
   return insights[quadrant] || insights[1];
 }
 
+// Built-in career guidance responses
+const careerResponses: Record<string, string[]> = {
+  career: [
+    "Focus on building your Capability first - understand your unique strengths and how they create value. The 3PN framework emphasizes that self-knowledge is the foundation of all career growth.",
+    "Consider where you are in the CAD quadrant. If you're in Q1 or Q2, focus on building systems. If you're in Q3, focus on systematizing your natural talents. Q4 is about multiplying your impact.",
+  ],
+  skills: [
+    "The 3PN framework groups skills into four pillars: Capability (knowing yourself), Competence (doing the work), Character (being trustworthy), and Capacity (scaling your impact). Focus on the pillar where you scored lowest.",
+    "Start with one skill at a time. Build a system around practicing it daily. Track your progress weekly. This is the 'System-First' approach from the CAD framework.",
+  ],
+  confidence: [
+    "Confidence comes from Command - the internal state in the CAD framework. Build it through consistent small wins, reflection on your strengths, and progressive challenges.",
+    "Remember the un-outsourcing philosophy: you already have the potential (Point A). Building confidence means recognizing you're the Pilot, not a passenger. Start with what you already know you're good at.",
+  ],
+  mentor: [
+    "A good mentor helps you move from your current quadrant toward Q4 (Mastery). Look for someone who has both Command AND System in the areas where you want to grow.",
+    "The 3PN network connects professionals at different stages. Reach out to people one quadrant ahead of you - they understand your current challenges best.",
+  ],
+  default: [
+    "That's a great question! The 3PN framework emphasizes 'un-outsourcing' - taking control of your own development journey. Start by understanding where you are in the CAD quadrant (take our assessment if you haven't), then focus on building both Command (internal confidence) and System (external structures).",
+    "Every career journey is unique, but the CAD framework gives you a compass. Focus on your weakest pillar among Capability, Competence, Character, and Capacity. Build one small system this week to practice improvement.",
+  ],
+};
+
+function getRelevantResponse(question: string): string {
+  const q = question.toLowerCase();
+  if (q.includes('career') || q.includes('job') || q.includes('work') || q.includes('profession')) {
+    return careerResponses.career[Math.floor(Math.random() * careerResponses.career.length)];
+  }
+  if (q.includes('skill') || q.includes('learn') || q.includes('develop') || q.includes('grow')) {
+    return careerResponses.skills[Math.floor(Math.random() * careerResponses.skills.length)];
+  }
+  if (q.includes('confiden') || q.includes('afraid') || q.includes('doubt') || q.includes('unsure')) {
+    return careerResponses.confidence[Math.floor(Math.random() * careerResponses.confidence.length)];
+  }
+  if (q.includes('mentor') || q.includes('coach') || q.includes('guide') || q.includes('network')) {
+    return careerResponses.mentor[Math.floor(Math.random() * careerResponses.mentor.length)];
+  }
+  return careerResponses.default[Math.floor(Math.random() * careerResponses.default.length)];
+}
+
 export async function generateCareerGuidance(
   question: string,
   userContext?: { quadrant?: QuadrantLevel; pathway?: string; name?: string }
 ): Promise<string> {
+  // If no API key, use built-in responses
+  if (!import.meta.env.VITE_GEMINI_API_KEY) {
+    return getRelevantResponse(question);
+  }
+
   try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
     const systemPrompt = `You are a supportive career coach for young professionals in the 3PN (Prepare, Progress, and Prosper Network) program. 
     
 Your role is to:
@@ -192,25 +233,19 @@ ${userContext?.quadrant ? `- The user is currently in Q${userContext.quadrant}` 
 ${userContext?.pathway ? `- Their strategic pathway is: ${userContext.pathway}` : ''}
 ${userContext?.name ? `- Address them as ${userContext.name}` : ''}`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt
-        },
-        {
-          role: 'user',
-          content: question
-        }
+    const result = await model.generateContent({
+      contents: [
+        { role: 'user', parts: [{ text: `${systemPrompt}\n\nUser question: ${question}` }] }
       ],
-      temperature: 0.7,
-      max_tokens: 500
+      generationConfig: {
+        maxOutputTokens: 500,
+        temperature: 0.7,
+      },
     });
 
-    return completion.choices[0].message.content || 'I apologize, but I encountered an issue generating a response. Please try again.';
+    return result.response.text() || 'I apologize, but I encountered an issue generating a response. Please try again.';
   } catch (error) {
     console.error('Error generating career guidance:', error);
-    return 'I apologize, but I encountered a technical issue. Please try again or contact support if the problem persists.';
+    return getRelevantResponse(question);
   }
 }

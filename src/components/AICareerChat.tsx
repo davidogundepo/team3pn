@@ -89,7 +89,7 @@ export const AICareerChat = () => {
             </div>
             <div>
               <CardTitle className="text-lg">AI Career Coach</CardTitle>
-              <p className="text-xs text-muted-foreground">Powered by OpenAI</p>
+              <p className="text-xs text-muted-foreground">Powered by Gemini</p>
             </div>
           </div>
           <Button
