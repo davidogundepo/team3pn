@@ -22,15 +22,55 @@ import {
   ArrowRight,
   CheckCircle,
   Users,
+  Clock,
+  Zap,
 } from 'lucide-react';
 
 interface AssessmentResult {
   id: string;
-  stage: string;
+  quadrant: number;
+  pathway: string;
   completed_at: string;
   ai_insights: any;
-  scores: any;
+  cad_results: any;
 }
+
+const quadrantInfo: Record<number, {
+  icon: any;
+  title: string;
+  subtitle: string;
+  color: string;
+  bgColor: string;
+}> = {
+  1: {
+    icon: Rocket,
+    title: 'Q1: The Unsure',
+    subtitle: 'Awareness + No System',
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500/10',
+  },
+  2: {
+    icon: Clock,
+    title: 'Q2: The Specialist',
+    subtitle: 'Awareness + System',
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
+  },
+  3: {
+    icon: Zap,
+    title: 'Q3: The Dependable',
+    subtitle: 'Command + No System',
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-500/10',
+  },
+  4: {
+    icon: HeartHandshake,
+    title: 'Q4: Mastery',
+    subtitle: 'Command + System',
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-500/10',
+  },
+};
 
 const Dashboard = () => {
   const { user, signOut, loading: authLoading } = useAuth();
@@ -77,32 +117,21 @@ const Dashboard = () => {
     }
   };
 
-  const getStageInfo = (stage: string) => {
-    const stages = {
-      'know-yourself': {
-        icon: Rocket,
-        title: 'Know Yourself',
-        color: 'text-blue-500',
-        bgColor: 'bg-blue-500/10',
-      },
-      'build-yourself': {
-        icon: TrendingUp,
-        title: 'Build Yourself',
-        color: 'text-green-500',
-        bgColor: 'bg-green-500/10',
-      },
-      'multiply-impact': {
-        icon: HeartHandshake,
-        title: 'Multiply Impact',
-        color: 'text-purple-500',
-        bgColor: 'bg-purple-500/10',
-      },
-    };
-    return stages[stage as keyof typeof stages] || stages['know-yourself'];
+  const getQuadrantDisplay = (quadrant: number) => {
+    return quadrantInfo[quadrant] || quadrantInfo[1];
   };
 
   const latestAssessment = assessments[0];
   const hasAssessment = assessments.length > 0;
+
+  // Extract pillar scores from latest assessment
+  const pillarScores = latestAssessment?.cad_results?.pillarScores || {
+    Capability: 0,
+    Competence: 0,
+    Character: 0,
+    Capacity: 0,
+  };
+  const maxPillarScore = 80; // 20 questions * 4 max per question, divided by 4 pillars ≈ 80 max
 
   if (authLoading || loading) {
     return (
@@ -125,7 +154,7 @@ const Dashboard = () => {
                   Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋
                 </h1>
                 <p className="text-muted-foreground">
-                  Here's your career development dashboard
+                  Here's your CAD Diagnostic dashboard
                 </p>
               </div>
               <Button variant="outline" onClick={signOut}>
@@ -140,11 +169,11 @@ const Dashboard = () => {
               <div className="bg-gradient-hero rounded-2xl p-12 text-primary-foreground mb-8">
                 <Target className="w-16 h-16 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold mb-4">
-                  Ready to discover your path?
+                  Ready to discover your quadrant?
                 </h2>
                 <p className="text-lg mb-6 text-primary-foreground/90">
-                  Take the 3PN Self-Assessment to get personalized guidance powered
-                  by AI.
+                  Take the CAD Diagnostic to discover where you are on the journey
+                  from Point A (Potential) to Point B (Power).
                 </p>
                 <Button
                   size="lg"
@@ -156,37 +185,48 @@ const Dashboard = () => {
                 </Button>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-4 gap-4">
                 <Card>
                   <CardHeader>
                     <Rocket className="w-8 h-8 text-blue-500 mb-2" />
-                    <CardTitle className="text-lg">Know Yourself</CardTitle>
+                    <CardTitle className="text-sm">Q1: The Unsure</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>
-                      Discover your strengths and career clarity
+                    <CardDescription className="text-xs">
+                      Awareness + No System
                     </CardDescription>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader>
-                    <TrendingUp className="w-8 h-8 text-green-500 mb-2" />
-                    <CardTitle className="text-lg">Build Yourself</CardTitle>
+                    <Clock className="w-8 h-8 text-green-500 mb-2" />
+                    <CardTitle className="text-sm">Q2: The Specialist</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>
-                      Develop skills and accelerate growth
+                    <CardDescription className="text-xs">
+                      Awareness + System
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <Zap className="w-8 h-8 text-orange-500 mb-2" />
+                    <CardTitle className="text-sm">Q3: The Dependable</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-xs">
+                      Command + No System
                     </CardDescription>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader>
                     <HeartHandshake className="w-8 h-8 text-purple-500 mb-2" />
-                    <CardTitle className="text-lg">Multiply Impact</CardTitle>
+                    <CardTitle className="text-sm">Q4: Mastery</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>
-                      Lead, mentor, and scale your influence
+                    <CardDescription className="text-xs">
+                      Command + System
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -202,53 +242,52 @@ const Dashboard = () => {
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
-                {/* Current Stage */}
+                {/* Current Quadrant */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Your Current Stage</CardTitle>
+                    <CardTitle>Your Current Quadrant</CardTitle>
                     <CardDescription>
-                      Based on your latest assessment
+                      Based on your latest CAD Diagnostic
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {latestAssessment && (
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={`p-4 rounded-xl ${
-                            getStageInfo(latestAssessment.stage).bgColor
-                          }`}
-                        >
-                          {(() => {
-                            const StageIcon = getStageInfo(latestAssessment.stage).icon;
-                            return (
-                              <StageIcon
-                                className={`w-8 h-8 ${
-                                  getStageInfo(latestAssessment.stage).color
-                                }`}
-                              />
-                            );
-                          })()}
+                    {latestAssessment && (() => {
+                      const info = getQuadrantDisplay(latestAssessment.quadrant);
+                      const QuadIcon = info.icon;
+                      return (
+                        <div className="flex items-start gap-4">
+                          <div className={`p-4 rounded-xl ${info.bgColor}`}>
+                            <QuadIcon className={`w-8 h-8 ${info.color}`} />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-bold mb-1">
+                              {info.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              {info.subtitle}
+                            </p>
+                            {latestAssessment.pathway && (
+                              <p className="text-sm text-primary font-medium mb-2">
+                                Strategic Pathway: {latestAssessment.pathway}
+                              </p>
+                            )}
+                            <p className="text-muted-foreground text-sm mb-4">
+                              Completed on{' '}
+                              {new Date(latestAssessment.completed_at).toLocaleDateString()}
+                            </p>
+                            <Button onClick={() => navigate('/assessment')}>
+                              Retake Assessment
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold mb-1">
-                            {getStageInfo(latestAssessment.stage).title}
-                          </h3>
-                          <p className="text-muted-foreground text-sm mb-4">
-                            Completed on{' '}
-                            {new Date(latestAssessment.completed_at).toLocaleDateString()}
-                          </p>
-                          <Button onClick={() => navigate('/assessment')}>
-                            Retake Assessment
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </CardContent>
                 </Card>
 
                 {/* Quick Actions */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <Card className="cursor-pointer hover:border-primary transition-colors">
+                  <Card className="cursor-pointer hover:border-primary transition-colors" onClick={() => navigate('/resources')}>
                     <CardHeader>
                       <BookOpen className="w-6 h-6 text-primary mb-2" />
                       <CardTitle className="text-base">Resources</CardTitle>
@@ -260,7 +299,7 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="cursor-pointer hover:border-primary transition-colors">
+                  <Card className="cursor-pointer hover:border-primary transition-colors" onClick={() => navigate('/mentors')}>
                     <CardHeader>
                       <Users className="w-6 h-6 text-primary mb-2" />
                       <CardTitle className="text-base">Find Mentors</CardTitle>
@@ -270,7 +309,7 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="cursor-pointer hover:border-primary transition-colors">
+                  <Card className="cursor-pointer hover:border-primary transition-colors" onClick={() => navigate('/events')}>
                     <CardHeader>
                       <Calendar className="w-6 h-6 text-primary mb-2" />
                       <CardTitle className="text-base">Events</CardTitle>
@@ -291,34 +330,36 @@ const Dashboard = () => {
                   </Card>
                 </div>
 
-                {/* Progress Tracker */}
+                {/* Pillar Scores */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Your Progress</CardTitle>
-                    <CardDescription>Track your development journey</CardDescription>
+                    <CardTitle>Your Pillar Scores</CardTitle>
+                    <CardDescription>Performance across the 3Cs + Capacity framework</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm font-medium">Self-Awareness</span>
-                        <span className="text-sm text-muted-foreground">75%</span>
+                    {Object.entries(pillarScores).map(([pillar, score]) => {
+                      const percentage = Math.round(((score as number) / maxPillarScore) * 100);
+                      return (
+                        <div key={pillar}>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm font-medium">{pillar}</span>
+                            <span className="text-sm text-muted-foreground">{percentage}%</span>
+                          </div>
+                          <Progress value={percentage} />
+                        </div>
+                      );
+                    })}
+                    {latestAssessment?.cad_results?.readinessForQ4 != null && (
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm font-semibold">Readiness for Mastery (Q4)</span>
+                          <span className="text-sm font-semibold text-primary">
+                            {latestAssessment.cad_results.readinessForQ4.toFixed(1)}%
+                          </span>
+                        </div>
+                        <Progress value={latestAssessment.cad_results.readinessForQ4} />
                       </div>
-                      <Progress value={75} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm font-medium">Skills Development</span>
-                        <span className="text-sm text-muted-foreground">60%</span>
-                      </div>
-                      <Progress value={60} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm font-medium">Network Building</span>
-                        <span className="text-sm text-muted-foreground">40%</span>
-                      </div>
-                      <Progress value={40} />
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -328,7 +369,7 @@ const Dashboard = () => {
                   <CardHeader>
                     <CardTitle>AI-Powered Insights</CardTitle>
                     <CardDescription>
-                      Personalized guidance based on your assessment
+                      Personalized guidance based on your CAD Diagnostic
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -390,24 +431,32 @@ const Dashboard = () => {
                   <CardHeader>
                     <CardTitle>Assessment History</CardTitle>
                     <CardDescription>
-                      View your previous assessments
+                      View your previous CAD Diagnostics
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {assessments.map((assessment) => {
-                        const stageInfo = getStageInfo(assessment.stage);
-                        const StageIcon = stageInfo.icon;
+                        const info = getQuadrantDisplay(assessment.quadrant);
+                        const QuadIcon = info.icon;
                         return (
                           <div
                             key={assessment.id}
                             className="flex items-center gap-4 p-4 border border-border rounded-lg"
                           >
-                            <div className={`p-3 rounded-lg ${stageInfo.bgColor}`}>
-                              <StageIcon className={`w-6 h-6 ${stageInfo.color}`} />
+                            <div className={`p-3 rounded-lg ${info.bgColor}`}>
+                              <QuadIcon className={`w-6 h-6 ${info.color}`} />
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-semibold">{stageInfo.title}</h4>
+                              <h4 className="font-semibold">{info.title}</h4>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                {info.subtitle}
+                              </p>
+                              {assessment.pathway && (
+                                <p className="text-xs text-primary">
+                                  {assessment.pathway}
+                                </p>
+                              )}
                               <p className="text-sm text-muted-foreground">
                                 {new Date(assessment.completed_at).toLocaleDateString('en-US', {
                                   year: 'numeric',
@@ -430,7 +479,7 @@ const Dashboard = () => {
                   <CardHeader>
                     <CardTitle>Your Action Plan</CardTitle>
                     <CardDescription>
-                      Recommended next steps based on your stage
+                      Recommended next steps based on your quadrant
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

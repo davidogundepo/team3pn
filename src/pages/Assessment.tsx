@@ -454,7 +454,8 @@ const Assessment = () => {
                           setShowResults(false);
                           setCurrentQuestion(0);
                           setAnswers({});
-                          setStage("");
+                          setQuadrant(null);
+                          setCadResults(null);
                           setAiInsights(null);
                           setCaptureInfo(false);
                           setUserInfo({ name: "", email: "" });
@@ -506,7 +507,7 @@ const Assessment = () => {
                     Question {currentQuestion + 1} of {assessmentQuestions.length}
                   </span>
                   <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">
-                    {question.category}
+                    {question.pillar} — {question.quality}
                   </span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -520,7 +521,7 @@ const Assessment = () => {
               {/* Question */}
               <div className="text-center mb-10">
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                  {question.question}
+                  {question.statement}
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   Select the option that best describes you
@@ -529,23 +530,23 @@ const Assessment = () => {
 
               {/* Options */}
               <div className="space-y-4 mb-8">
-                {question.options.map((option) => (
+                {question.options.map((option, index) => (
                   <button
-                    key={option.value}
+                    key={option.quadrant}
                     onClick={() => handleAnswer(option)}
                     className={`w-full p-5 rounded-xl border-2 text-left transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md ${
-                      answers[currentQuestion]?.value === option.value
+                      answers[currentQuestion]?.quadrant === option.quadrant
                         ? "border-primary bg-primary/10 shadow-md"
                         : "border-border"
                     }`}
                   >
                     <div className="flex items-start gap-4">
                       <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold transition-colors ${
-                        answers[currentQuestion]?.value === option.value
+                        answers[currentQuestion]?.quadrant === option.quadrant
                           ? "border-primary bg-primary text-white"
                           : "border-muted-foreground/30 text-muted-foreground"
                       }`}>
-                        {option.value}
+                        {String.fromCharCode(65 + index)}
                       </div>
                       <span className="text-base font-medium text-foreground flex-1">
                         {option.label}

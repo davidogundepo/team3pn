@@ -36,28 +36,31 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          stage: 'know-yourself' | 'build-yourself' | 'multiply-impact';
+          quadrant: number;
+          pathway: string;
           responses: any;
-          scores: any;
-          ai_insights: string | null;
+          cad_results: any;
+          ai_insights: any;
           completed_at: string;
           created_at: string;
         };
         Insert: {
           id?: string;
           user_id: string;
-          stage: 'know-yourself' | 'build-yourself' | 'multiply-impact';
+          quadrant: number;
+          pathway: string;
           responses: any;
-          scores: any;
-          ai_insights?: string | null;
+          cad_results: any;
+          ai_insights?: any;
           completed_at?: string;
           created_at?: string;
         };
         Update: {
-          stage?: 'know-yourself' | 'build-yourself' | 'multiply-impact';
+          quadrant?: number;
+          pathway?: string;
           responses?: any;
-          scores?: any;
-          ai_insights?: string | null;
+          cad_results?: any;
+          ai_insights?: any;
         };
       };
       mentor_matches: {

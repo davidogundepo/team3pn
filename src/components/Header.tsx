@@ -101,7 +101,7 @@ const Header = () => {
                 </Link>
               ))}
               <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
-                <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="outline" className="w-full">Sign In</Button>
                 </Link>
                 <Link to="/assessment" onClick={() => setIsMenuOpen(false)}>
