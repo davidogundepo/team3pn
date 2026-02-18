@@ -749,7 +749,7 @@ const Assessment = () => {
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+                    className="h-full bg-primary transition-all duration-300"
                     style={{ width: `${((currentQuestion + 1) / assessmentQuestions.length) * 100}%` }}
                   />
                 </div>

@@ -32,7 +32,6 @@ import {
   Crown,
   Camera,
   Edit3,
-  Sparkles,
 } from 'lucide-react';
 
 interface Milestone {
@@ -375,12 +374,8 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 md:px-6">
           {/* Premium Profile Header */}
           <div className="mb-8">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-border/50 p-6 md:p-8">
-              {/* Subtle decorative elements */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/3 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-              
-              <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 {/* Avatar */}
                 <div className="relative group">
                   <div 
@@ -606,7 +601,7 @@ const Dashboard = () => {
           {/* Main Content */}
           {!hasAssessment ? (
             <div className="max-w-2xl mx-auto text-center py-12">
-              <div className="bg-gradient-hero rounded-2xl p-12 text-primary-foreground mb-8">
+                <div className="bg-primary rounded-2xl p-12 text-primary-foreground mb-8">
                 <Target className="w-16 h-16 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold mb-4">
                   Ready to discover your quadrant?
@@ -886,7 +881,7 @@ const Dashboard = () => {
                           <div className="max-w-sm mx-auto mt-4 flex items-center gap-2 px-4">
                             <div className="h-1 flex-1 rounded-full bg-muted overflow-hidden">
                               <div 
-                                className="h-full bg-gradient-to-r from-primary/80 to-primary rounded-full transition-all duration-1000 ease-out"
+                                className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
                                 style={{ 
                                   width: `${((latestAssessment.quadrant - 1) / 3) * 100}%`,
                                   animation: 'growWidth 1s ease-out 0.3s both'
@@ -971,11 +966,10 @@ const Dashboard = () => {
                         {milestones.map((milestone, index) => (
                           <div
                             key={milestone.id}
-                            className="group relative overflow-hidden rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background p-5 transition-all duration-300 hover:border-primary/25 hover:shadow-lg hover:shadow-primary/5"
+                            className="rounded-xl border border-border p-5 transition-all duration-300 hover:border-primary/25"
                             style={{ animationDelay: `${index * 100}ms` }}
                           >
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-colors" />
-                            <div className="relative flex items-start gap-4">
+                            <div className="flex items-start gap-4">
                               <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/10">
                                 {getMilestoneIcon(milestone.type)}
                               </div>
