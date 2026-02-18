@@ -15,7 +15,7 @@ import jsPDF from 'jspdf';
 const quadrantDetails = {
   1: {
     icon: Rocket,
-    title: "Q1: The Unsure",
+    title: "Q1: The New Traveler",
     subtitle: "Awareness + No System",
     description: "You recognize what's possible but haven't yet built the structures to achieve it. This is the starting point of transformation - un-outsourcing begins with awareness.",
     characteristics: [
@@ -34,7 +34,7 @@ const quadrantDetails = {
   },
   2: {
     icon: Clock,
-    title: "Q2: The Specialist",
+    title: "Q2: The Steady Support",
     subtitle: "Awareness + System",
     description: "You've built strong systems and processes but may not fully command your unique power. Route A (System-First) develops mastery through structured excellence.",
     characteristics: [
@@ -53,7 +53,7 @@ const quadrantDetails = {
   },
   3: {
     icon: Zap,
-    title: "Q3: The Dependable",
+    title: "Q3: The Independent Starter",
     subtitle: "Command + No System",
     description: "You have natural talent and confidence but lack the systems to scale. Route B (Command-First) requires building structures around your strengths.",
     characteristics: [
@@ -72,7 +72,7 @@ const quadrantDetails = {
   },
   4: {
     icon: HeartHandshake,
-    title: "Q4: Mastery (Point B)",
+    title: "Q4: Systemic Leverage Peak",
     subtitle: "Command + System",
     description: "You've achieved the 3PN ideal: Capability, Competence, Character, and Capacity working in harmony. You're a Pilot, not a passenger.",
     characteristics: [

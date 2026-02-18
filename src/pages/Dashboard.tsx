@@ -66,28 +66,28 @@ const quadrantInfo: Record<number, {
 }> = {
   1: {
     icon: Rocket,
-    title: 'Q1: The Unsure',
+    title: 'Q1: The New Traveler',
     subtitle: 'Awareness + No System',
     color: 'text-blue-500',
     bgColor: 'bg-blue-500/10',
   },
   2: {
     icon: Clock,
-    title: 'Q2: The Specialist',
+    title: 'Q2: The Steady Support',
     subtitle: 'Awareness + System',
     color: 'text-green-500',
     bgColor: 'bg-green-500/10',
   },
   3: {
     icon: Zap,
-    title: 'Q3: The Dependable',
+    title: 'Q3: The Independent Starter',
     subtitle: 'Command + No System',
     color: 'text-orange-500',
     bgColor: 'bg-orange-500/10',
   },
   4: {
     icon: HeartHandshake,
-    title: 'Q4: Mastery',
+    title: 'Q4: Systemic Leverage Peak',
     subtitle: 'Command + System',
     color: 'text-purple-500',
     bgColor: 'bg-purple-500/10',
@@ -315,7 +315,7 @@ const Dashboard = () => {
                 <Card>
                   <CardHeader>
                     <Rocket className="w-8 h-8 text-blue-500 mb-2" />
-                    <CardTitle className="text-sm">Q1: The Unsure</CardTitle>
+                    <CardTitle className="text-sm">Q1: The New Traveler</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-xs">
@@ -326,7 +326,7 @@ const Dashboard = () => {
                 <Card>
                   <CardHeader>
                     <Clock className="w-8 h-8 text-green-500 mb-2" />
-                    <CardTitle className="text-sm">Q2: The Specialist</CardTitle>
+                    <CardTitle className="text-sm">Q2: The Steady Support</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-xs">
@@ -337,7 +337,7 @@ const Dashboard = () => {
                 <Card>
                   <CardHeader>
                     <Zap className="w-8 h-8 text-orange-500 mb-2" />
-                    <CardTitle className="text-sm">Q3: The Dependable</CardTitle>
+                    <CardTitle className="text-sm">Q3: The Independent Starter</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-xs">
@@ -348,7 +348,7 @@ const Dashboard = () => {
                 <Card>
                   <CardHeader>
                     <HeartHandshake className="w-8 h-8 text-purple-500 mb-2" />
-                    <CardTitle className="text-sm">Q4: Mastery</CardTitle>
+                    <CardTitle className="text-sm">Q4: Systemic Leverage Peak</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-xs">

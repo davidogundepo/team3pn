@@ -43,10 +43,10 @@ CAD Assessment Results:
 - User Name: ${userProfile?.name || 'Participant'}
 
 Quadrant Framework:
-- Q1 (The Unsure): Awareness + No System - Starting point of "un-outsourcing"
-- Q2 (The Specialist): Awareness + System - Route A: System-First (corporate path)
-- Q3 (The Dependable): Command + No System - Route B: Command-First (entrepreneur path)
-- Q4 (Mastery): Command + System - Point B, full integration of 3Cs + Capacity
+- Q1 (The New Traveler): Awareness + No System - Starting point of "un-outsourcing"
+- Q2 (The Steady Support): Awareness + System - Route A: System-First (corporate path)
+- Q3 (The Independent Starter): Command + No System - Route B: Command-First (entrepreneur path)
+- Q4 (Systemic Leverage Peak): Command + System - Point B, full integration of 3Cs + Capacity
 
 The 3PN Philosophy:
 "Un-outsourcing" means transitioning from being a passenger to being a Pilot - moving from Point A (potential) to Point B (power).
@@ -83,7 +83,7 @@ Return ONLY valid JSON, no markdown formatting.`;
 function getFallbackInsights(quadrant: QuadrantLevel, pathway: string): PersonalizedInsights {
   const insights = {
     1: {
-      summary: "You're at Q1 (The Unsure), the starting point of your transformation journey. This is where 'un-outsourcing' begins - recognizing your potential while building the foundations to achieve it. You're ready to move from passenger to pilot.",
+      summary: "You're at Q1 (The New Traveler), the starting point of your transformation journey. This is where 'un-outsourcing' begins - recognizing your potential while building the foundations to achieve it. You're ready to move from passenger to pilot.",
       strengths: [
         "Self-awareness of where you are in your journey",
         "Willingness to grow and transform",
@@ -103,7 +103,7 @@ function getFallbackInsights(quadrant: QuadrantLevel, pathway: string): Personal
       motivationalMessage: "Every master started at Q1. Your awareness is the first spark of transformation - now it's time to build the fire. From passenger to Pilot starts here!"
     },
     2: {
-      summary: "You're at Q2 (The Specialist), following Route A: System-First. You've built strong external structures and processes. The next step is developing internal command to match your systematic excellence and reach Q4 (Mastery).",
+      summary: "You're at Q2 (The Steady Support), following Route A: System-First. You've built strong external structures and processes. The next step is developing internal command to match your systematic excellence and reach Q4 (Systemic Leverage Peak).",
       strengths: [
         "Strong systems and consistent execution",
         "Reliable performance within structures",
@@ -123,7 +123,7 @@ function getFallbackInsights(quadrant: QuadrantLevel, pathway: string): Personal
       motivationalMessage: "You've mastered the 'system' part of success. Now un-outsource your power by adding command. Q4 awaits when structure meets authentic leadership!"
     },
     3: {
-      summary: "You're at Q3 (The Dependable), following Route B: Command-First. You have natural talent and confidence, but building systems will amplify your impact. Your journey to Q4 (Mastery) requires systematizing your brilliance.",
+      summary: "You're at Q3 (The Independent Starter), following Route B: Command-First. You have natural talent and confidence, but building systems will amplify your impact. Your journey to Q4 (Systemic Leverage Peak) requires systematizing your brilliance.",
       strengths: [
         "Natural command and confidence in your abilities",
         "Strong instincts and decision-making capability",
@@ -143,7 +143,7 @@ function getFallbackInsights(quadrant: QuadrantLevel, pathway: string): Personal
       motivationalMessage: "You have the spark - now build the engine. Un-outsourcing means packaging your genius into systems that multiply your impact. Q4 is one framework away!"
     },
     4: {
-      summary: "You've reached Q4 (Mastery/Point B) - the integration of Command and System across all 3Cs plus Capacity. You've successfully 'un-outsourced' your development. You're a Pilot, not a passenger. Now it's time to multiply impact and guide others.",
+      summary: "You've reached Q4 (Systemic Leverage Peak / Point B) - the integration of Command and System across all 3Cs plus Capacity. You've successfully 'un-outsourced' your development. You're a Pilot, not a passenger. Now it's time to multiply impact and guide others.",
       strengths: [
         "Full command of your unique capabilities",
         "Robust systems that amplify your strengths",
@@ -228,7 +228,7 @@ Your role is to:
 - Keep responses concise (2-3 paragraphs)
 - Reference the CAD Diagnostic framework when relevant: Capability → Competence → Character → Capacity
 - Emphasize the "un-outsourcing" philosophy: transitioning from passenger to Pilot (Point A to Point B)
-- Understand the quadrant system: Q1 (The Unsure), Q2 (The Specialist), Q3 (The Dependable), Q4 (Mastery)
+- Understand the quadrant system: Q1 (The New Traveler), Q2 (The Steady Support), Q3 (The Independent Starter), Q4 (Systemic Leverage Peak)
 ${userContext?.quadrant ? `- The user is currently in Q${userContext.quadrant}` : ''}
 ${userContext?.pathway ? `- Their strategic pathway is: ${userContext.pathway}` : ''}
 ${userContext?.name ? `- Address them as ${userContext.name}` : ''}`;

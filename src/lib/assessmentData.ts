@@ -1,13 +1,13 @@
 // 3PN Self-Assessment Tool - CAD Diagnostic Framework
 // 20 diagnostic questions across Capability, Competence, Character, Capacity
-// Each question has 4 descriptive states: Q1 (The Unsure), Q2 (The Specialist), Q3 (The Dependable), Q4 (Mastery)
+// Each question has 4 descriptive states: Q1 (New Traveler), Q2 (Steady Support), Q3 (Independent Starter), Q4 (Systemic Leverage Peak)
 
 export type Pillar = 'Capability' | 'Competence' | 'Character' | 'Capacity';
 export type Stage = 1 | 2 | 3;
 export type QuadrantLevel = 1 | 2 | 3 | 4; // Q1-Q4
 
 export interface QuestionOption {
-  quadrant: QuadrantLevel; // Q1=The Unsure, Q2=The Specialist, Q3=The Dependable, Q4=Mastery
+  quadrant: QuadrantLevel; // Q1=New Traveler, Q2=Steady Support, Q3=Independent Starter, Q4=Systemic Leverage Peak
   label: string;
   internalState: 'awareness' | 'command'; // For quadrant mapping
   externalState: 'no-system' | 'system'; // For quadrant mapping
@@ -690,10 +690,10 @@ export const assessmentQuestions: Question[] = [
 
 // CAD Diagnostic Scoring Algorithm
 export interface QuadrantCounts {
-  1: number; // Q1: The Unsure (Awareness + No System)
-  2: number; // Q2: The Specialist (Awareness + System)
-  3: number; // Q3: The Dependable (Command + No System)
-  4: number; // Q4: Mastery (Command + System)
+  1: number; // Q1: New Traveler (Awareness + No System)
+  2: number; // Q2: Steady Support (Awareness + System)
+  3: number; // Q3: Independent Starter (Command + No System)
+  4: number; // Q4: Systemic Leverage Peak (Command + System)
 }
 
 export interface PillarScores {

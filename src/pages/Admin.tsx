@@ -39,10 +39,10 @@ interface AdminNotification {
 }
 
 const quadrantLabels: Record<number, string> = {
-  1: "Q1: The Unsure",
-  2: "Q2: The Specialist",
-  3: "Q3: The Dependable",
-  4: "Q4: Mastery",
+  1: "Q1: The New Traveler",
+  2: "Q2: The Steady Support",
+  3: "Q3: The Independent Starter",
+  4: "Q4: Systemic Leverage Peak",
 };
 
 const quadrantColors: Record<number, string> = {

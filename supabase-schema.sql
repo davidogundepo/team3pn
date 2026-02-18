@@ -157,14 +157,24 @@ CREATE TABLE IF NOT EXISTS public.notifications (
 
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
--- Users can see their own notifications
+-- Users can see their own notifications; admins can see admin notifications
 CREATE POLICY "Users can view own notifications"
   ON public.notifications FOR SELECT
-  USING (auth.uid() = user_id OR for_admin = TRUE);
+  USING (
+    auth.uid() = user_id
+    OR (for_admin = TRUE AND auth.jwt() ->> 'email' IN (
+      SELECT unnest(string_to_array(current_setting('app.admin_emails', true), ','))
+    ))
+  );
 
 CREATE POLICY "Users can update own notifications"
   ON public.notifications FOR UPDATE
-  USING (auth.uid() = user_id OR for_admin = TRUE);
+  USING (
+    auth.uid() = user_id
+    OR (for_admin = TRUE AND auth.jwt() ->> 'email' IN (
+      SELECT unnest(string_to_array(current_setting('app.admin_emails', true), ','))
+    ))
+  );
 
 -- System can insert notifications (via triggers)
 CREATE POLICY "System can insert notifications"
