@@ -101,7 +101,7 @@ const STORAGE_KEY = '3pn-assessment-progress';
 
 const Assessment = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, QuestionOption>>({});
   const [showResults, setShowResults] = useState(false);
@@ -113,6 +113,16 @@ const Assessment = () => {
   const [loading, setLoading] = useState(false);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const [savedProgress, setSavedProgress] = useState<{ question: number; answers: Record<number, QuestionOption>; answeredCount: number } | null>(null);
+
+  // Auth guard — must be logged in to take assessment
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast.info('Please sign in to take the assessment', {
+        description: 'Your results will be saved to your account.',
+      });
+      navigate('/login', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   // Check for saved progress on mount
   useEffect(() => {
