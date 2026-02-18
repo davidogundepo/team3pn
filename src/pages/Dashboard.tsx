@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AICareerChat } from '@/components/AICareerChat';
@@ -29,6 +29,9 @@ import {
   Star,
   Flame,
   Crown,
+  Camera,
+  Edit3,
+  Sparkles,
 } from 'lucide-react';
 
 interface Milestone {
@@ -103,6 +106,10 @@ const Dashboard = () => {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -115,6 +122,65 @@ const Dashboard = () => {
       loadDashboardData();
     }
   }, [user]);
+
+  // Avatar upload handler
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      const { toast } = await import('sonner');
+      toast.error('Please select an image file');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      const { toast } = await import('sonner');
+      toast.error('Image must be under 2MB');
+      return;
+    }
+
+    setAvatarUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${ext}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile
+      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
+      setProfile((prev: any) => ({ ...prev, avatar_url: publicUrl }));
+
+      const { toast } = await import('sonner');
+      toast.success('Profile picture updated!');
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      const { toast } = await import('sonner');
+      toast.error('Failed to upload image. Make sure the avatars bucket exists in Supabase Storage.');
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  // Update display name
+  const handleNameUpdate = async () => {
+    if (!nameInput.trim() || !user) return;
+    await supabase.from('profiles').update({ full_name: nameInput.trim() }).eq('id', user.id);
+    setProfile((prev: any) => ({ ...prev, full_name: nameInput.trim() }));
+    setEditingName(false);
+    const { toast } = await import('sonner');
+    toast.success('Name updated!');
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -216,75 +282,151 @@ const Dashboard = () => {
       <Header />
       <main className="pt-20 pb-16">
         <div className="container mx-auto px-4 md:px-6">
-          {/* Header */}
+          {/* Premium Profile Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">
-                  Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋
-                </h1>
-                <p className="text-muted-foreground">
-                  Here's your CAD Diagnostic dashboard
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                {/* Notification Bell */}
-                <div className="relative">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative"
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-border/50 p-6 md:p-8">
+              {/* Subtle decorative elements */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/3 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+              
+              <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6">
+                {/* Avatar */}
+                <div className="relative group">
+                  <div 
+                    className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/20 bg-primary/10 flex items-center justify-center cursor-pointer transition-all duration-300 group-hover:border-primary/40 group-hover:shadow-lg group-hover:shadow-primary/10"
+                    onClick={() => avatarInputRef.current?.click()}
                   >
-                    <Bell className="w-4 h-4" />
-                    {unreadNotifs > 0 && (
-                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
-                        {unreadNotifs}
+                    {avatarUploading ? (
+                      <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                    ) : profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-3xl md:text-4xl font-bold text-primary">
+                        {(profile?.full_name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
                       </span>
                     )}
-                  </Button>
-                  {showNotifications && (
-                    <div className="absolute right-0 top-12 w-80 bg-card border border-border rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
-                      <div className="p-3 border-b border-border flex items-center justify-between">
-                        <h4 className="font-semibold text-sm">Notifications</h4>
-                        {unreadNotifs > 0 && (
-                          <button onClick={markAllRead} className="text-xs text-primary hover:underline">
-                            Mark all read
-                          </button>
-                        )}
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary text-primary-foreground rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm">
+                    <Camera className="w-3.5 h-3.5" />
+                  </div>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarUpload}
+                  />
+                </div>
+
+                {/* User Info */}
+                <div className="flex-1 text-center md:text-left">
+                  <div className="flex items-center gap-2 justify-center md:justify-start">
+                    {editingName ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={nameInput}
+                          onChange={(e) => setNameInput(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleNameUpdate()}
+                          className="text-2xl font-bold bg-transparent border-b-2 border-primary outline-none text-foreground"
+                          autoFocus
+                        />
+                        <Button size="sm" onClick={handleNameUpdate}>Save</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingName(false)}>Cancel</Button>
                       </div>
-                      {notifications.length > 0 ? (
-                        notifications.map(notif => (
-                          <div
-                            key={notif.id}
-                            className={`p-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 transition-colors ${
-                              !notif.read ? 'bg-primary/5' : ''
-                            }`}
-                            onClick={() => markNotificationRead(notif.id)}
-                          >
-                            <div className="flex items-start gap-2">
-                              {!notif.read && <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
-                              <div className={!notif.read ? '' : 'ml-4'}>
-                                <p className="text-sm font-medium">{notif.title}</p>
-                                <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {new Date(notif.created_at).toLocaleDateString()}
-                                </p>
+                    ) : (
+                      <>
+                        <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                          Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}! 👋
+                        </h1>
+                        <button
+                          onClick={() => { setNameInput(profile?.full_name || ''); setEditingName(true); }}
+                          className="text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground mt-1">
+                    {user?.email}
+                  </p>
+                  <div className="flex items-center gap-4 mt-3 justify-center md:justify-start text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5" />
+                      Joined {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—'}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Trophy className="w-3.5 h-3.5" />
+                      {milestones.length} badge{milestones.length !== 1 ? 's' : ''}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5" />
+                      {assessments.length} assessment{assessments.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-3">
+                  {/* Notification Bell */}
+                  <div className="relative">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setShowNotifications(!showNotifications)}
+                      className="relative rounded-xl"
+                    >
+                      <Bell className="w-4 h-4" />
+                      {unreadNotifs > 0 && (
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center animate-pulse">
+                          {unreadNotifs}
+                        </span>
+                      )}
+                    </Button>
+                    {showNotifications && (
+                      <div className="absolute right-0 top-12 w-80 bg-card border border-border rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
+                        <div className="p-3 border-b border-border flex items-center justify-between">
+                          <h4 className="font-semibold text-sm">Notifications</h4>
+                          {unreadNotifs > 0 && (
+                            <button onClick={markAllRead} className="text-xs text-primary hover:underline">
+                              Mark all read
+                            </button>
+                          )}
+                        </div>
+                        {notifications.length > 0 ? (
+                          notifications.map(notif => (
+                            <div
+                              key={notif.id}
+                              className={`p-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 transition-colors ${
+                                !notif.read ? 'bg-primary/5' : ''
+                              }`}
+                              onClick={() => markNotificationRead(notif.id)}
+                            >
+                              <div className="flex items-start gap-2">
+                                {!notif.read && <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
+                                <div className={!notif.read ? '' : 'ml-4'}>
+                                  <p className="text-sm font-medium">{notif.title}</p>
+                                  <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {new Date(notif.created_at).toLocaleDateString()}
+                                  </p>
+                                </div>
                               </div>
                             </div>
+                          ))
+                        ) : (
+                          <div className="p-6 text-center text-sm text-muted-foreground">
+                            No notifications yet
                           </div>
-                        ))
-                      ) : (
-                        <div className="p-6 text-center text-sm text-muted-foreground">
-                          No notifications yet
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <Button variant="outline" onClick={signOut} className="rounded-xl">
+                    Sign Out
+                  </Button>
                 </div>
-                <Button variant="outline" onClick={signOut}>
-                  Sign Out
-                </Button>
               </div>
             </div>
           </div>
@@ -493,113 +635,213 @@ const Dashboard = () => {
 
               {/* Progress & Milestones Tab */}
               <TabsContent value="progress" className="space-y-6">
-                {/* Journey Progress */}
-                <Card>
+                {/* Animated Journey Tower */}
+                <Card className="overflow-hidden">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="w-5 h-5 text-primary" />
-                      Your Mastery Voyage Journey
+                      Your Mastery Voyage
                     </CardTitle>
                     <CardDescription>
-                      Track your progress from Point A (Potential) to Point B (Power)
+                      Building your way from Potential to Power — one block at a time
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center gap-2 mb-6">
-                      {[1, 2, 3, 4].map((q) => {
-                        const info = quadrantInfo[q];
-                        const QuadIcon = info.icon;
-                        const isCurrentOrPast = latestAssessment && latestAssessment.quadrant >= q;
-                        const isCurrent = latestAssessment && latestAssessment.quadrant === q;
-                        return (
-                          <div key={q} className="flex-1">
-                            <div className={`relative flex flex-col items-center p-3 rounded-xl border-2 transition-all ${
-                              isCurrent
-                                ? 'border-primary bg-primary/5 shadow-md'
-                                : isCurrentOrPast
-                                ? 'border-green-500/50 bg-green-50 dark:bg-green-900/10'
-                                : 'border-border bg-muted/30'
-                            }`}>
-                              {isCurrent && (
-                                <span className="absolute -top-2 -right-2 text-lg">📍</span>
-                              )}
-                              <QuadIcon className={`w-6 h-6 mb-1 ${isCurrent ? info.color : isCurrentOrPast ? 'text-green-500' : 'text-muted-foreground'}`} />
-                              <span className={`text-xs font-semibold ${isCurrent ? 'text-primary' : 'text-muted-foreground'}`}>
-                                Q{q}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground text-center mt-0.5">
-                                {info.title.replace(/Q\d:\s/, '')}
-                              </span>
-                            </div>
-                            {q < 4 && (
-                              <div className={`h-0.5 mt-3 mx-1 rounded ${isCurrentOrPast ? 'bg-green-500' : 'bg-border'}`} />
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {latestAssessment?.cad_results?.readinessForQ4 != null && (
-                      <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
-                        <div className="flex justify-between mb-2">
-                          <span className="text-sm font-medium">Overall Readiness for Mastery</span>
-                          <span className="text-sm font-bold text-primary">
-                            {latestAssessment.cad_results.readinessForQ4.toFixed(1)}%
-                          </span>
+                    <div className="flex flex-col md:flex-row gap-8 items-center">
+
+                      {/* Building Block Tower */}
+                      <div className="flex-1 w-full">
+                        <div className="flex flex-col-reverse gap-0 max-w-sm mx-auto">
+                          {[1, 2, 3, 4].map((q) => {
+                            const info = quadrantInfo[q];
+                            const QuadIcon = info.icon;
+                            const isReached = latestAssessment && latestAssessment.quadrant >= q;
+                            const isCurrent = latestAssessment && latestAssessment.quadrant === q;
+                            const blockWidth = `${55 + (4 - q) * 15}%`;
+
+                            return (
+                              <div key={q} className="flex justify-center" style={{ 
+                                animation: isReached ? `buildUp 0.5s ease-out ${(q - 1) * 0.15}s both` : 'none'
+                              }}>
+                                <div
+                                  className={`relative rounded-lg border-2 transition-all duration-500 px-4 py-3 ${
+                                    isCurrent
+                                      ? 'border-primary bg-primary/10 shadow-lg shadow-primary/20'
+                                      : isReached
+                                      ? 'border-green-500/40 bg-green-500/5'
+                                      : 'border-border/50 bg-muted/20 opacity-40'
+                                  }`}
+                                  style={{ width: blockWidth }}
+                                >
+                                  {isCurrent && (
+                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping" />
+                                  )}
+                                  {isCurrent && (
+                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full" />
+                                  )}
+
+                                  <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                      isCurrent ? 'bg-primary/20' : isReached ? 'bg-green-500/10' : 'bg-muted'
+                                    }`}>
+                                      <QuadIcon className={`w-4 h-4 ${
+                                        isCurrent ? info.color : isReached ? 'text-green-500' : 'text-muted-foreground'
+                                      }`} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className={`text-xs font-bold ${isCurrent ? 'text-primary' : 'text-foreground'}`}>
+                                        Q{q}: {info.title.replace(/Q\d:\s/, '')}
+                                      </p>
+                                      <p className="text-[10px] text-muted-foreground truncate">
+                                        {q === 1 ? 'Foundation laid' : q === 2 ? 'Skills growing' : q === 3 ? 'Independence rising' : 'Systemic mastery'}
+                                      </p>
+                                    </div>
+                                    {isReached && !isCurrent && (
+                                      <span className="text-green-500 text-xs">✓</span>
+                                    )}
+                                    {isCurrent && (
+                                      <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full font-semibold">You</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                        <Progress value={latestAssessment.cad_results.readinessForQ4} />
+
+                        {/* Journey connector line */}
+                        {latestAssessment && (
+                          <div className="max-w-sm mx-auto mt-4 flex items-center gap-2 px-4">
+                            <div className="h-1 flex-1 rounded-full bg-muted overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-primary/80 to-primary rounded-full transition-all duration-1000 ease-out"
+                                style={{ 
+                                  width: `${((latestAssessment.quadrant - 1) / 3) * 100}%`,
+                                  animation: 'growWidth 1s ease-out 0.3s both'
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              {latestAssessment.quadrant}/4 reached
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    )}
+
+                      {/* SVG Progress Ring */}
+                      {latestAssessment?.cad_results?.readinessForQ4 != null && (
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="relative w-36 h-36">
+                            <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
+                              <circle cx="60" cy="60" r="50" fill="none" stroke="currentColor" className="text-muted" strokeWidth="8" />
+                              <circle
+                                cx="60" cy="60" r="50" fill="none" stroke="currentColor"
+                                className="text-primary" strokeWidth="8" strokeLinecap="round"
+                                strokeDasharray={`${2 * Math.PI * 50}`}
+                                strokeDashoffset={`${2 * Math.PI * 50 * (1 - (latestAssessment.cad_results.readinessForQ4 / 100))}`}
+                                style={{ transition: 'stroke-dashoffset 1.5s ease-out' }}
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <span className="text-2xl font-bold text-foreground">
+                                {latestAssessment.cad_results.readinessForQ4.toFixed(0)}%
+                              </span>
+                              <span className="text-[10px] text-muted-foreground">Readiness</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground text-center max-w-[150px]">
+                            Mastery readiness based on your CAD diagnostic
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                     {assessments.length > 1 && (
-                      <div className="mt-4 pt-4 border-t border-border">
-                        <p className="text-sm text-muted-foreground">
-                          <strong>Assessments taken:</strong> {assessments.length} &nbsp;·&nbsp;
-                          <strong>First:</strong> {new Date(assessments[assessments.length - 1].completed_at).toLocaleDateString()} &nbsp;·&nbsp;
-                          <strong>Latest:</strong> {new Date(assessments[0].completed_at).toLocaleDateString()}
-                        </p>
+                      <div className="mt-6 pt-4 border-t border-border flex items-center gap-6 text-sm text-muted-foreground">
+                        <span><strong className="text-foreground">{assessments.length}</strong> assessments</span>
+                        <span>First: {new Date(assessments[assessments.length - 1].completed_at).toLocaleDateString()}</span>
+                        <span>Latest: {new Date(assessments[0].completed_at).toLocaleDateString()}</span>
                       </div>
                     )}
                   </CardContent>
                 </Card>
 
-                {/* Milestones */}
+                {/* Quick Stats as animated mini-cards */}
+                <div className="grid sm:grid-cols-3 gap-4">
+                  {[
+                    { value: assessments.length, label: 'Assessments Taken', color: 'text-primary', bgColor: 'bg-primary/5', borderColor: 'border-primary/10' },
+                    { value: milestones.length, label: 'Badges Earned', color: 'text-amber-500', bgColor: 'bg-amber-500/5', borderColor: 'border-amber-500/10' },
+                    { value: `${latestAssessment?.cad_results?.readinessForQ4?.toFixed(0) || '0'}%`, label: 'Mastery Readiness', color: 'text-green-500', bgColor: 'bg-green-500/5', borderColor: 'border-green-500/10' },
+                  ].map((stat, i) => (
+                    <Card key={stat.label} className={`${stat.borderColor} ${stat.bgColor} border`} style={{ animation: `fadeSlideUp 0.4s ease-out ${i * 0.1}s both` }}>
+                      <CardContent className="pt-6 text-center">
+                        <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
+                        <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Achievement Badges */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-amber-500" />
-                      Achievements & Milestones
+                      <Trophy className="w-5 h-5 text-primary" />
+                      Achievement Badges
                     </CardTitle>
                     <CardDescription>
-                      Badges you've earned on your journey
+                      Milestones earned on your mastery voyage
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     {milestones.length > 0 ? (
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        {milestones.map((milestone) => (
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        {milestones.map((milestone, index) => (
                           <div
                             key={milestone.id}
-                            className="flex items-start gap-3 p-4 rounded-xl border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+                            className="group relative overflow-hidden rounded-xl border border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background p-5 transition-all duration-300 hover:border-primary/25 hover:shadow-lg hover:shadow-primary/5"
+                            style={{ animationDelay: `${index * 100}ms` }}
                           >
-                            <div className="p-2 rounded-lg bg-card border border-border">
-                              {getMilestoneIcon(milestone.type)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-sm">{milestone.title}</p>
-                              <p className="text-xs text-muted-foreground mt-0.5">{milestone.description}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {new Date(milestone.achieved_at).toLocaleDateString()}
-                              </p>
+                            <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-colors" />
+                            <div className="relative flex items-start gap-4">
+                              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/10">
+                                {getMilestoneIcon(milestone.type)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm text-foreground">{milestone.title}</p>
+                                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{milestone.description}</p>
+                                <p className="text-xs text-primary/60 mt-2 flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(milestone.achieved_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </p>
+                              </div>
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <Trophy className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-                        <p className="text-muted-foreground text-sm">No milestones yet.</p>
-                        <p className="text-muted-foreground text-xs mt-1">
-                          Complete your first assessment to earn badges!
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/5 mb-4">
+                          <Trophy className="w-8 h-8 text-primary/30" />
+                        </div>
+                        <p className="text-muted-foreground text-sm font-medium">No badges yet</p>
+                        <p className="text-muted-foreground text-xs mt-1 mb-6">
+                          Complete assessments and progress to earn badges!
                         </p>
+                        <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                          {[
+                            { icon: <Rocket className="w-4 h-4" />, label: 'First Assessment' },
+                            { icon: <TrendingUp className="w-4 h-4" />, label: 'Quadrant Upgrade' },
+                            { icon: <Crown className="w-4 h-4" />, label: 'Reached Mastery' },
+                          ].map((badge) => (
+                            <div key={badge.label} className="flex flex-col items-center gap-2 p-3 rounded-xl border border-dashed border-border opacity-40">
+                              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                                {badge.icon}
+                              </div>
+                              <span className="text-[10px] text-muted-foreground text-center leading-tight">{badge.label}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </CardContent>

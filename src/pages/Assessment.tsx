@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -97,6 +97,8 @@ const whatYouGet = [
   { icon: Target, title: "Action Plan", description: "Receive a clear roadmap tailored to you" },
 ];
 
+const STORAGE_KEY = '3pn-assessment-progress';
+
 const Assessment = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -109,14 +111,78 @@ const Assessment = () => {
   const [cadResults, setCadResults] = useState<any>(null);
   const [aiInsights, setAiInsights] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [savedProgress, setSavedProgress] = useState<{ question: number; answers: Record<number, QuestionOption>; answeredCount: number } | null>(null);
+
+  // Check for saved progress on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.answers && Object.keys(parsed.answers).length > 0 && parsed.question < assessmentQuestions.length) {
+          setSavedProgress({
+            question: parsed.question,
+            answers: parsed.answers,
+            answeredCount: Object.keys(parsed.answers).length,
+          });
+          setShowResumePrompt(true);
+        }
+      }
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
+
+  // Save progress to localStorage on every answer
+  const saveProgress = useCallback((question: number, currentAnswers: Record<number, QuestionOption>) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        question,
+        answers: currentAnswers,
+        timestamp: Date.now(),
+      }));
+    } catch {
+      // Storage full or unavailable — silently fail
+    }
+  }, []);
+
+  // Clear saved progress
+  const clearProgress = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setSavedProgress(null);
+    setShowResumePrompt(false);
+  }, []);
+
+  // Resume from saved progress
+  const resumeAssessment = () => {
+    if (savedProgress) {
+      setCurrentQuestion(savedProgress.question);
+      setAnswers(savedProgress.answers);
+      setShowResumePrompt(false);
+      toast.success(`Resumed from question ${savedProgress.question + 1}!`);
+    }
+  };
+
+  // Start fresh
+  const startFresh = () => {
+    clearProgress();
+    setCurrentQuestion(0);
+    setAnswers({});
+    setShowResumePrompt(false);
+  };
 
   const handleAnswer = (option: QuestionOption) => {
-    setAnswers((prev) => ({ ...prev, [currentQuestion]: option }));
+    const newAnswers = { ...answers, [currentQuestion]: option };
+    setAnswers(newAnswers);
 
     if (currentQuestion < assessmentQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+      const nextQ = currentQuestion + 1;
+      setCurrentQuestion(nextQ);
+      saveProgress(nextQ, newAnswers);
     } else {
-      // Assessment complete - process results
+      // Assessment complete - clear saved progress and process results
+      clearProgress();
       processResults();
     }
   };
@@ -537,6 +603,7 @@ const Assessment = () => {
                         variant="outline" 
                         size="lg" 
                         onClick={() => {
+                          clearProgress();
                           setShowResults(false);
                           setCurrentQuestion(0);
                           setAnswers({});
@@ -570,8 +637,34 @@ const Assessment = () => {
         <section className="py-16 md:py-24">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-2xl mx-auto">
+              {/* Resume Prompt */}
+              {showResumePrompt && savedProgress && (
+                <div className="mb-8 p-6 rounded-2xl bg-primary/5 border-2 border-primary/20">
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
+                      <Clock className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground mb-1">
+                      Welcome Back! 👋
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      You answered {savedProgress.answeredCount} of 20 questions last time.
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                      <Button onClick={resumeAssessment} size="lg">
+                        Continue Where I Left Off
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </Button>
+                      <Button onClick={startFresh} variant="outline" size="lg">
+                        Start Fresh
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Intro Text - only on first question */}
-              {currentQuestion === 0 && (
+              {currentQuestion === 0 && !showResumePrompt && (
                 <div className="text-center mb-10">
                   <div className="inline-flex items-center gap-2 text-muted-foreground text-sm mb-4">
                     <Clock className="w-4 h-4" />

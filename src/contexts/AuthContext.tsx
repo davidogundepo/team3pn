@@ -66,6 +66,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: email,
         full_name: fullName,
       });
+
+      // Fire-and-forget: Send welcome email to user + notify admins
+      const emailPayload = { email, fullName };
+      fetch('/api/send-welcome-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailPayload),
+      }).catch(() => {}); // silent fail — don't block signup
+
+      fetch('/api/notify-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailPayload),
+      }).catch(() => {}); // silent fail — don't block signup
     }
 
     return { error };
