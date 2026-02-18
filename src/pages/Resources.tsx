@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Search, Play, FileText, Calendar, Users, ArrowRight, Filter } from "lucide-react";
+import { toast } from "sonner";
 
 const categories = ["All", "Articles", "Videos", "Podcasts", "Guides", "Templates"];
 
@@ -155,6 +156,7 @@ const Resources = () => {
                 <div
                   key={resource.id}
                   className="group bg-card rounded-2xl overflow-hidden border border-border/60 shadow-soft hover:shadow-medium transition-shadow cursor-pointer"
+                  onClick={() => toast.info(`"${resource.title}" — full content coming soon!`)}
                 >
                   <div className="relative">
                     <img
@@ -218,6 +220,7 @@ const Resources = () => {
                 <div
                   key={resource.id}
                   className="group bg-card rounded-xl overflow-hidden border border-border/60 shadow-soft hover:shadow-medium transition-shadow cursor-pointer"
+                  onClick={() => toast.info(`"${resource.title}" — full content coming soon!`)}
                 >
                   <div className="relative h-40">
                     <img

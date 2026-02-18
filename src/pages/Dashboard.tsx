@@ -588,7 +588,7 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="cursor-pointer hover:border-primary transition-colors">
+                  <Card className="cursor-pointer hover:border-primary transition-colors" onClick={() => document.getElementById('ai-coach-section')?.scrollIntoView({ behavior: 'smooth' })}>
                     <CardHeader>
                       <MessageCircle className="w-6 h-6 text-primary mb-2" />
                       <CardTitle className="text-base">AI Coach</CardTitle>
@@ -1025,7 +1025,9 @@ const Dashboard = () => {
         </div>
       </main>
       <Footer />
-      <AICareerChat />
+      <div id="ai-coach-section">
+        <AICareerChat />
+      </div>
     </div>
   );
 };
