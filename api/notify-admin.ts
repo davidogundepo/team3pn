@@ -6,13 +6,13 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const SITE_URL = process.env.VITE_SITE_URL || 'https://team3pn.vercel.app';
 
 const ADMIN_EMAILS = [
-  'egukoefetive@gmail.com',
+  'eguko.efetive@gmail.com',
   'dk@dkjonah.com',
-  'davidoludepo@gmail.com',
+  'olusowunmi79@gmail.com',
 ];
 
 const CC_EMAILS = [
-  'olusowunmi79@gmail.com',
+  'david.oludepo@gmail.com',
 ];
 
 function buildAdminNotificationHtml(fullName: string, email: string, signupDate: string): string {
