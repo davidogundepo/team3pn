@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { generatePersonalizedInsights } from "@/lib/openai";
+import { generatePersonalizedInsights } from "@/lib/gemini";
 import { assessmentQuestions, calculateQuadrant, QuestionOption, QuadrantLevel, Pillar } from "@/lib/assessmentData";
-import { ArrowRight, ArrowLeft, CheckCircle, Rocket, TrendingUp, HeartHandshake, Clock, Zap, Target, Loader2, Sparkles, Download } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle, Rocket, TrendingUp, HeartHandshake, Clock, Zap, Target, Loader2, Sparkles, Download, Mail, Share2 } from "lucide-react";
 import jsPDF from 'jspdf';
 
 const quadrantDetails = {
@@ -207,40 +207,97 @@ const Assessment = () => {
     // Add header
     doc.setFontSize(24);
     doc.setTextColor(79, 70, 229);
-    doc.text('3PN CAD Diagnostic Results', 20, 30);
+    doc.text('3PN Mastery Voyage — CAD Diagnostic', 20, 30);
+    
+    // Add subtitle
+    doc.setFontSize(11);
+    doc.setTextColor(120, 120, 120);
+    doc.text('Your journey from Point A (Potential) to Point B (Power)', 20, 40);
     
     // Add date
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
-    doc.text(new Date().toLocaleDateString(), 20, 40);
+    doc.text(new Date().toLocaleDateString(), 20, 48);
     
     // Add quadrant
     doc.setFontSize(18);
     doc.setTextColor(0, 0, 0);
-    doc.text(`Your Quadrant: ${quadInfo.title}`, 20, 60);
+    doc.text(`Your Quadrant: ${quadInfo.title}`, 20, 65);
     
     // Add pathway
     doc.setFontSize(12);
-    doc.text(`Strategic Pathway: ${cadResults.strategicPathway}`, 20, 70);
+    doc.text(`Strategic Pathway: ${cadResults.strategicPathway}`, 20, 75);
+    doc.text(`Readiness for Mastery: ${cadResults.readinessForQ4.toFixed(1)}%`, 20, 85);
     
     // Add description
     const splitDescription = doc.splitTextToSize(quadInfo.description, 170);
-    doc.text(splitDescription, 20, 85);
-    
-    // Add readiness score
-    doc.setFontSize(14);
-    doc.text(`Readiness for Mastery: ${cadResults.readinessForQ4.toFixed(1)}%`, 20, 115);
+    doc.text(splitDescription, 20, 100);
     
     // Add AI insights if available
     if (aiInsights) {
       doc.setFontSize(14);
-      doc.text('AI-Powered Insights', 20, 135);
+      doc.text('AI-Powered Insights', 20, 130);
       
       doc.setFontSize(10);
       const splitSummary = doc.splitTextToSize(aiInsights.summary, 170);
-      doc.text(splitSummary, 20, 145);
+      doc.text(splitSummary, 20, 140);
       
-      // Add next page for focus qualities
+      let yPos = 160;
+      
+      // Strengths
+      if (aiInsights.strengths?.length) {
+        doc.setFontSize(12);
+        doc.text('Your Strengths:', 20, yPos);
+        doc.setFontSize(10);
+        aiInsights.strengths.forEach((s: string, i: number) => {
+          yPos += 10;
+          if (yPos > 270) { doc.addPage(); yPos = 30; }
+          const lines = doc.splitTextToSize(`• ${s}`, 165);
+          doc.text(lines, 25, yPos);
+          yPos += (lines.length - 1) * 5;
+        });
+      }
+      
+      yPos += 15;
+      
+      // Areas for Growth
+      if (aiInsights.areasForGrowth?.length) {
+        if (yPos > 250) { doc.addPage(); yPos = 30; }
+        doc.setFontSize(12);
+        doc.text('Areas for Growth:', 20, yPos);
+        doc.setFontSize(10);
+        aiInsights.areasForGrowth.forEach((a: string, i: number) => {
+          yPos += 10;
+          if (yPos > 270) { doc.addPage(); yPos = 30; }
+          const lines = doc.splitTextToSize(`• ${a}`, 165);
+          doc.text(lines, 25, yPos);
+          yPos += (lines.length - 1) * 5;
+        });
+      }
+      
+      // Action Steps on new page
+      if (aiInsights.actionSteps?.length) {
+        doc.addPage();
+        doc.setFontSize(14);
+        doc.text('Your Action Plan', 20, 30);
+        doc.setFontSize(10);
+        aiInsights.actionSteps.forEach((step: string, i: number) => {
+          const lines = doc.splitTextToSize(`${i + 1}. ${step}`, 165);
+          doc.text(lines, 20, 45 + (i * 15));
+        });
+      }
+      
+      // Motivational message
+      if (aiInsights.motivationalMessage) {
+        const lastPage = doc.internal.pages.length - 1;
+        doc.setPage(lastPage);
+        doc.setFontSize(11);
+        doc.setTextColor(79, 70, 229);
+        const msg = doc.splitTextToSize(`"${aiInsights.motivationalMessage}"`, 170);
+        doc.text(msg, 20, 260);
+      }
+    } else {
+      // Focus qualities if no AI insights
       doc.addPage();
       doc.setFontSize(14);
       doc.text('Your Focus Qualities:', 20, 30);
@@ -251,9 +308,34 @@ const Assessment = () => {
       });
     }
     
+    // Footer on last page
+    const totalPages = doc.internal.pages.length - 1;
+    doc.setPage(totalPages);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text('3PN - Prepare, Progress, and Prosper Network | www.3pn.org', 20, 285);
+    
     // Download
-    doc.save('3PN-CAD-Assessment-Results.pdf');
+    doc.save('3PN-Mastery-Voyage-Results.pdf');
     toast.success('PDF downloaded!');
+  };
+
+  const shareViaEmail = () => {
+    if (!quadrant || !cadResults) return;
+    const quadInfo = quadrantDetails[quadrant];
+    const subject = encodeURIComponent('My 3PN Mastery Voyage — CAD Diagnostic Results');
+    const body = encodeURIComponent(
+      `My 3PN CAD Diagnostic Results\n\n` +
+      `Quadrant: ${quadInfo.title}\n` +
+      `${quadInfo.subtitle}\n\n` +
+      `Strategic Pathway: ${cadResults.strategicPathway}\n` +
+      `Readiness for Mastery: ${cadResults.readinessForQ4.toFixed(1)}%\n\n` +
+      `${quadInfo.description}\n\n` +
+      (aiInsights?.summary ? `AI Insights: ${aiInsights.summary}\n\n` : '') +
+      `Take the assessment: ${window.location.origin}/assessment\n\n` +
+      `— 3PN: Prepare, Progress, and Prosper Network`
+    );
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
   };
 
   const quadInfo = quadrant ? quadrantDetails[quadrant] : null;
@@ -277,10 +359,10 @@ const Assessment = () => {
                     <div className="mb-8">
                       <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                       <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                        Your CAD Diagnostic is Complete! 🎉
+                        Your Mastery Voyage Begins! 🎉
                       </h1>
                       <p className="text-lg text-muted-foreground">
-                        Your journey from Point A to Point B begins here
+                        Your CAD Diagnostic is complete — your journey from Point A (Potential) to Point B (Power) starts now
                       </p>
                     </div>
 
@@ -428,12 +510,16 @@ const Assessment = () => {
                       </div>
                     )}
 
-                    {user && (
-                      <Button onClick={generatePDF} size="lg" className="mb-8">
+                    <div className="flex flex-wrap gap-3 justify-center mb-8">
+                      <Button onClick={generatePDF} size="lg">
                         <Download className="mr-2" />
-                        Download PDF Report
+                        Download PDF
                       </Button>
-                    )}
+                      <Button onClick={shareViaEmail} size="lg" variant="outline">
+                        <Mail className="mr-2" />
+                        Email Results
+                      </Button>
+                    </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       {user ? (
@@ -492,10 +578,10 @@ const Assessment = () => {
                     <span>5-7 minutes • 20 questions</span>
                   </div>
                   <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-                    3PN Self-Assessment
+                    3PN Mastery Voyage
                   </h1>
                   <p className="text-muted-foreground mb-6">
-                    Discover your career stage and get AI-powered personalized guidance
+                    Discover your quadrant and begin your journey from Point A (Potential) to Point B (Power)
                   </p>
                 </div>
               )}

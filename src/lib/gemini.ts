@@ -30,7 +30,7 @@ export async function generatePersonalizedInsights(
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
 
     const prompt = `You are a professional career coach specializing in the CAD Diagnostic framework (Capability, Competence, Character, Capacity). Based on an assessment, provide personalized insights.
 

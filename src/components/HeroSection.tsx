@@ -15,18 +15,18 @@ const HeroSection = () => {
           {/* Top Content */}
           <div className="flex flex-col items-center text-center text-primary-foreground max-w-4xl pt-8 md:pt-12">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 opacity-0 animate-fade-up">
-              Find Your Direction. Build Your Future.
+              Your Mastery Voyage Starts Here.
             </h1>
 
             <p className="text-lg md:text-xl text-primary-foreground/85 leading-relaxed mb-8 max-w-3xl opacity-0 animate-fade-up delay-100">
-              Whether you're starting out, changing paths, or feeling stuck, 3PN offers a free, clear three-step journey to build skills, prove your experience, and grow into leadership. Get your next step in under a minute.
+              Stop outsourcing your potential. 3PN's CAD Diagnostic helps you discover your quadrant, unlock your strategic pathway, and journey from Point A (Potential) to Point B (Power) — all completely free.
             </p>
 
             {/* Primary CTA Above Video */}
             <div className="opacity-0 animate-fade-up delay-200 mb-8">
               <Link to="/assessment">
                 <Button size="lg" className="group bg-primary hover:bg-primary/90 text-primary-foreground">
-                  Take Self-Assessment
+                  Begin Your Mastery Voyage
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>

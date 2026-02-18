@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { generateCareerGuidance } from '@/lib/openai';
+import { generateCareerGuidance } from '@/lib/gemini';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2, Send, Bot, User, Sparkles, X } from 'lucide-react';
 import { toast } from 'sonner';
