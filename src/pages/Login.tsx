@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Loader2, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import logo from '@/assets/3pn-logo.png';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -36,7 +37,7 @@ const Login = () => {
           formData.fullName
         );
         if (error) throw error;
-        toast.success('Account created! Check your email to verify.');
+        toast.success('Account created! Please check your email to verify.');
         navigate('/dashboard');
       }
     } catch (error: any) {
@@ -52,10 +53,12 @@ const Login = () => {
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-primary mb-2">3PN</h1>
+            <img src={logo} alt="3PN Logo" className="h-16 mx-auto mb-3" />
           </Link>
-          <p className="text-muted-foreground">
-            {isLogin ? 'Welcome back!' : 'Start your journey today'}
+          <p className="text-muted-foreground text-sm">
+            {isLogin
+              ? 'Welcome back to your Mastery Voyage'
+              : 'Discover where you are on the career readiness spectrum'}
           </p>
         </div>
 
@@ -67,8 +70,8 @@ const Login = () => {
             </h2>
             <p className="text-sm text-muted-foreground">
               {isLogin
-                ? 'Access your personalized career dashboard'
-                : 'Join thousands of young professionals'}
+                ? 'Access your CAD Diagnostic dashboard and track progress'
+                : 'Join the 3PN network — Prepare, Progress, and Prosper'}
             </p>
           </div>
 
@@ -81,7 +84,7 @@ const Login = () => {
                   <Input
                     id="fullName"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Your full name"
                     value={formData.fullName}
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
@@ -183,7 +186,7 @@ const Login = () => {
               className="w-full mt-4"
               onClick={() => navigate('/assessment')}
             >
-              Continue as Guest
+              Take the Assessment as Guest
             </Button>
           </div>
         </div>
