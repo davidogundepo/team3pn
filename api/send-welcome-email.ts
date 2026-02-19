@@ -135,7 +135,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: '3PN <onboarding@resend.dev>',
+      from: '3PN <info@momms.co.uk>',
       to: email,
       subject: `Welcome to 3PN, ${fullName.split(' ')[0]}! 🎉`,
       html: buildWelcomeHtml(fullName),
