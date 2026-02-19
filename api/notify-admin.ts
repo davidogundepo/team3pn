@@ -133,7 +133,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }).format(new Date());
 
     const { data, error } = await resend.emails.send({
-      from: '3PN <onboarding@resend.dev>',
+      from: '3PN <info@momms.co.uk>',
       to: ADMIN_EMAILS,
       cc: CC_EMAILS,
       subject: `New 3PN Signup: ${fullName}`,
